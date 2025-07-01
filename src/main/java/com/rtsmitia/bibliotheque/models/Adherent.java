@@ -38,7 +38,7 @@ public class Adherent {
 
     // === Constructor to auto-set date_inscription ===
     @PrePersist
-    protected void onCreate() {`
+    protected void onCreate() {
         this.dateInscription = LocalDateTime.now();
     }
 
