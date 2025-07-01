@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Library App</title>
+</head>
+<body>
+
+<header>
+    <h1>My Library</h1>
+    <nav>
+        <a href="/">Home</a> |
+        <a href="/adherents/new">Add Adherent</a>
+    </nav>
+    <hr>
+</header>
+
+<main>
+    <!-- Messages block -->
+    <div th:if="${errorMessage}" style="color: red;">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <div th:if="${successMessage}" style="color: green;">
+        <p th:text="${successMessage}"></p>
+    </div>
+    
+    <!-- Conditional content based on page type -->
+    <div th:if="${pageType == 'adherent-form'}" th:replace="adherent-form :: content"></div>
+    
+    <!-- Default content if no specific page type -->
+    <div th:if="${pageType == null}">
+        <h2>Welcome to My Library</h2>
+        <p>Please use the navigation menu above.</p>
+    </div>
+</main>
+
+<footer>
+    <hr>
+    <p>&copy; 2025 My Library App</p>
+</footer>
+
+</body>
+</html>
