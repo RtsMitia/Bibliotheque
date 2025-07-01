@@ -2,6 +2,7 @@ package com.rtsmitia.bibliotheque.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "adherents")
@@ -11,7 +12,7 @@ public class Adherent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "numero_adherent", nullable = false, unique = true, length = 10)
+    @Column(name = "numero_adherent", insertable = false, updatable = false)
     private String numeroAdherent;
 
     @Column(nullable = false, length = 100)
@@ -39,7 +40,10 @@ public class Adherent {
     // === Constructor to auto-set date_inscription ===
     @PrePersist
     protected void onCreate() {
-        this.dateInscription = LocalDateTime.now();
+        // Only set date, number is handled by database trigger
+        if (this.dateInscription == null) {
+            this.dateInscription = LocalDateTime.now();
+        }
     }
 
     // === Getters and Setters ===

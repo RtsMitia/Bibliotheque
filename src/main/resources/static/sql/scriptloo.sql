@@ -59,17 +59,18 @@ CREATE TABLE penalite_config(
    FOREIGN KEY(id_type_adherent) REFERENCES type_adherent(id)
 );
 
+CREATE SEQUENCE sequence_adherents START 1;
 CREATE TABLE adherents(
-   id SMALLINT,
-   numero_adherent VARCHAR(50),
+   id INT DEFAULT nextval('sequence_adherents'),
+   numero_adherent VARCHAR(50) UNIQUE NOT NULL,
    prenom VARCHAR(255) NOT NULL,
    nom VARCHAR(255) NOT NULL,
-   email VARCHAR(255) NOT NULL,
+   email VARCHAR(255) NOT NULL ,
    telephone VARCHAR(50),
    adresse VARCHAR(50),
    date_inscription DATE NOT NULL,
    id_type_adherent SMALLINT NOT NULL,
-   PRIMARY KEY(id, numero_adherent),
+   PRIMARY KEY(id),
    UNIQUE(email),
    FOREIGN KEY(id_type_adherent) REFERENCES type_adherent(id)
 );
@@ -127,10 +128,9 @@ CREATE TABLE reservation(
    date_debut_pret DATE NOT NULL,
    id_exemplaire SMALLINT NOT NULL,
    numero_adherent SMALLINT NOT NULL,
-   numero_adherent_1 VARCHAR(50) NOT NULL,
    PRIMARY KEY(id),
    FOREIGN KEY(id_exemplaire) REFERENCES exemplaire(id),
-   FOREIGN KEY(numero_adherent, numero_adherent_1) REFERENCES adherents(id, numero_adherent)
+   FOREIGN KEY(numero_adherent) REFERENCES adherents(id)
 );
 
 CREATE TABLE pret(
@@ -139,11 +139,10 @@ CREATE TABLE pret(
    date_fin DATE,
    date_retour DATE,
    numero_adherent SMALLINT NOT NULL,
-   numero_adherent_1 VARCHAR(50) NOT NULL,
    id_type_pret SMALLINT NOT NULL,
    id_exemplaire SMALLINT NOT NULL,
    PRIMARY KEY(id),
-   FOREIGN KEY(numero_adherent, numero_adherent_1) REFERENCES adherents(id, numero_adherent),
+   FOREIGN KEY(numero_adherent) REFERENCES adherents(id),
    FOREIGN KEY(id_type_pret) REFERENCES type_pret(id),
    FOREIGN KEY(id_exemplaire) REFERENCES exemplaire(id)
 );
@@ -162,9 +161,8 @@ CREATE TABLE paiement_cotisation(
    montant_paye DECIMAL(15,2),
    date_paiement DATE,
    numero_adherent SMALLINT NOT NULL,
-   numero_adherent_1 VARCHAR(50) NOT NULL,
    PRIMARY KEY(id),
-   FOREIGN KEY(numero_adherent, numero_adherent_1) REFERENCES adherents(id, numero_adherent)
+   FOREIGN KEY(numero_adherent) REFERENCES adherents(id)
 );
 
 CREATE TABLE penalite(
@@ -172,9 +170,8 @@ CREATE TABLE penalite(
    date_debut DATE NOT NULL,
    date_fin DATE NOT NULL,
    numero_adherent SMALLINT NOT NULL,
-   numero_adherent_1 VARCHAR(50) NOT NULL,
    PRIMARY KEY(id),
-   FOREIGN KEY(numero_adherent, numero_adherent_1) REFERENCES adherents(id, numero_adherent)
+   FOREIGN KEY(numero_adherent) REFERENCES adherents(id)
 );
 
 CREATE TABLE statut_reservation(
