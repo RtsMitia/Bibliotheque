@@ -29,7 +29,7 @@ public class AdherentController {
     public String showForm(Model model) {
         model.addAttribute("adherent", new Adherent());
         model.addAttribute("typesAdherents", typeAdherentService.getAllTypes());
-        model.addAttribute("pageType", "adherent-form");
+        model.addAttribute("contentPage", "adherent-form");
 
         return "layout";
     }
@@ -46,7 +46,7 @@ public class AdherentController {
         }
         model.addAttribute("typesAdherents", typeAdherentService.getAllTypes());
         // Always set the content fragment
-        model.addAttribute("pageType", "adherent-form");
+        model.addAttribute("contentPage", "adherent-form");
 
         return "layout";
     }
