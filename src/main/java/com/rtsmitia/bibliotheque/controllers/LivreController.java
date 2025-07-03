@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -58,7 +59,12 @@ public class LivreController {
      * Show form to add a new livre
      */
     @GetMapping("/add")
-    public String showAddLivreForm(Model model) {
+    public String showAddLivreForm(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        // Check admin access
+        if (!LoginController.checkAdminAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+        
         model.addAttribute("livre", new Livre());
         model.addAttribute("auteurs", livreService.getAllAuteurs());
         model.addAttribute("genres", livreService.getAllGenres());
@@ -77,7 +83,13 @@ public class LivreController {
                           @RequestParam(required = false) List<Long> genreIds,
                           @RequestParam(required = false) List<Long> contraintIds,
                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateSortie,
+                          HttpSession session,
                           RedirectAttributes redirectAttributes) {
+        // Check admin access
+        if (!LoginController.checkAdminAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+        
         try {
             // Set the date if not already set
             if (livre.getDateSortie() == null) {

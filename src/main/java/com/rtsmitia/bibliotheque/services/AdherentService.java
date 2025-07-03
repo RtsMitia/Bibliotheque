@@ -87,4 +87,21 @@ public class AdherentService {
         return adherentsWithDemande.stream()
                 .anyMatch(a -> a.getId().equals(adherent.getId()));
     }
+    
+    /**
+     * Validate client number and return adherent if valid
+     */
+    public Optional<Adherent> validateClientNumber(String numeroAdherent) {
+        return adherentRepository.findByNumeroAdherent(numeroAdherent);
+    }
+    
+    /**
+     * Check if adherent has valid subscription status
+     */
+    public boolean hasValidSubscription(Adherent adherent) {
+        // Check if adherent has 'valide' status (active subscription)
+        List<Adherent> validAdherents = getAdherentsByStatut(StatutAbonnement.valide);
+        return validAdherents.stream()
+                .anyMatch(a -> a.getId().equals(adherent.getId()));
+    }
 }

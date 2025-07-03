@@ -16,6 +16,8 @@ public interface AdherentRepository extends JpaRepository<Adherent, Integer>{
     
     Optional<Adherent> findByEmail(String email);
     
+    Optional<Adherent> findByNumeroAdherent(String numeroAdherent);
+    
     @Query("SELECT a FROM Adherent a " +
            "JOIN a.historiqueStatuts h " +
            "WHERE h.statut = com.rtsmitia.bibliotheque.models.HistoriqueStatutAbonnement.StatutAbonnement.demande " +
