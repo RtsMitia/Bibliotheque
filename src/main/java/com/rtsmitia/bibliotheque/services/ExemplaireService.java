@@ -98,11 +98,53 @@ public class ExemplaireService {
     }
 
     /**
-     * Check if an exemplaire is currently borrowed
+     * Check if a specific exemplaire is available
+     */
+    @Transactional(readOnly = true)
+    public boolean isAvailable(Exemplaire exemplaire) {
+        if (exemplaire == null) {
+            return false;
+        }
+        
+        // Check if the exemplaire is in the available list for its book
+        List<Exemplaire> availableExemplaires = getAvailableExemplairesByLivreId(exemplaire.getLivre().getId());
+        return availableExemplaires.stream()
+                .anyMatch(ex -> ex.getId().equals(exemplaire.getId()));
+    }
+
+    /**
+     * Mark exemplaire as borrowed (this method might be implemented in the repository)
+     */
+    public void markAsBorrowed(Exemplaire exemplaire) {
+        // This method assumes that availability is determined by active loans
+        // The actual borrowing status is managed through the Pret entity
+        // No direct action needed here as availability is calculated based on active loans
+    }
+
+    /**
+     * Mark exemplaire as available (this method might be implemented in the repository)
+     */
+    public void markAsAvailable(Exemplaire exemplaire) {
+        // This method assumes that availability is determined by loan returns
+        // The actual availability status is managed through the Pret entity
+        // No direct action needed here as availability is calculated based on returned loans
+    }
+
+    /**
+     * Check if a specific exemplaire is currently borrowed
      */
     @Transactional(readOnly = true)
     public boolean isExemplaireBorrowed(Long exemplaireId) {
-        return exemplaireRepository.isCurrentlyBorrowed(exemplaireId);
+        Optional<Exemplaire> exemplaireOpt = getExemplaireById(exemplaireId);
+        if (exemplaireOpt.isEmpty()) {
+            return false;
+        }
+        
+        List<Exemplaire> borrowedExemplaires = exemplaireRepository.findBorrowedByLivreId(
+            exemplaireOpt.get().getLivre().getId()
+        );
+        return borrowedExemplaires.stream()
+                .anyMatch(ex -> ex.getId().equals(exemplaireId));
     }
 
     /**

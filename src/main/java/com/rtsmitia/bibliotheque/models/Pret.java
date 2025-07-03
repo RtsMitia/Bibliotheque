@@ -36,11 +36,18 @@ public class Pret {
     @OneToMany(mappedBy = "pret", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Prolongement> prolongements;
 
+    @OneToMany(mappedBy = "pret", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<StatutPret> statutsPret;
+
     // Default constructor
-    public Pret() {}
+    public Pret() {
+        this.prolongements = new java.util.ArrayList<>();
+        this.statutsPret = new java.util.ArrayList<>();
+    }
 
     // Constructor with parameters
     public Pret(LocalDateTime dateDebut, LocalDateTime dateFin, Adherent adherent, TypePret typePret, Exemplaire exemplaire) {
+        this();
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;
         this.adherent = adherent;
@@ -113,6 +120,14 @@ public class Pret {
         this.prolongements = prolongements;
     }
 
+    public List<StatutPret> getStatutsPret() {
+        return statutsPret;
+    }
+
+    public void setStatutsPret(List<StatutPret> statutsPret) {
+        this.statutsPret = statutsPret;
+    }
+
     // Helper method to check if book is returned
     public boolean isReturned() {
         return dateRetour != null;
@@ -121,6 +136,35 @@ public class Pret {
     // Helper method to check if book is overdue
     public boolean isOverdue() {
         return !isReturned() && dateFin != null && LocalDateTime.now().isAfter(dateFin);
+    }
+    
+    // Helper method to get current loan status
+    public StatutPret getCurrentStatus() {
+        if (statutsPret == null || statutsPret.isEmpty()) {
+            return null;
+        }
+        
+        // Return the most recent status (assuming they are ordered by date)
+        return statutsPret.stream()
+                .max((s1, s2) -> {
+                    if (s1.getDateChangement() == null && s2.getDateChangement() == null) return 0;
+                    if (s1.getDateChangement() == null) return -1;
+                    if (s2.getDateChangement() == null) return 1;
+                    return s1.getDateChangement().compareTo(s2.getDateChangement());
+                })
+                .orElse(null);
+    }
+    
+    // Helper method to check if loan is approved
+    public boolean isApproved() {
+        StatutPret currentStatus = getCurrentStatus();
+        return currentStatus != null && currentStatus.getStatut() == StatutPret.StatutPretEnum.valide;
+    }
+    
+    // Helper method to check if loan is pending
+    public boolean isPending() {
+        StatutPret currentStatus = getCurrentStatus();
+        return currentStatus != null && currentStatus.isPending();
     }
 
     @Override

@@ -257,6 +257,18 @@
                             </div>
                         </div>
                         
+                        <!-- Prêts Section -->
+                        <div class="nav-section">
+                            <button class="nav-section-header" onclick="toggleSection('prets-section')">
+                                <span><i class="fas fa-handshake"></i> Gestion des Prêts</span>
+                                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                            </button>
+                            <div class="nav-section-content" id="prets-section">
+                                <a href="${pageContext.request.contextPath}/prets/demandes"><i class="fas fa-clipboard-list"></i> Demandes de Prêt</a>
+                                <a href="${pageContext.request.contextPath}/prets/actifs"><i class="fas fa-book-open"></i> Prêts Actifs</a>
+                            </div>
+                        </div>
+                        
                         <!-- Logout -->
                         <form action="${pageContext.request.contextPath}/logout" method="post" style="margin-top: auto;">
                             <button type="submit" class="nav-section-header w-100 text-start" style="border: none; background: #e74c3c; color: white;">
