@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -143,5 +142,20 @@ public class AdherentService {
         
         return String.format("Max livres: %d, Durée: %d jours, Max réservations: %d", 
                            maxBooks, maxDays, maxReservations);
+    }
+    
+    /**
+     * Get adherent by ID with contraintes loaded
+     */
+    @Transactional(readOnly = true)
+    public Optional<Adherent> getAdherentWithContraintes(Long adherentId) {
+        Optional<Adherent> adherentOpt = adherentRepository.findById(adherentId.intValue());
+        if (adherentOpt.isPresent()) {
+            Adherent adherent = adherentOpt.get();
+            // Force initialization of contraintes collection
+            adherent.getContraintes().size();
+            return Optional.of(adherent);
+        }
+        return Optional.empty();
     }
 }

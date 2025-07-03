@@ -232,43 +232,75 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Confirmer l'emprunt</h5>
+                                <h5 class="modal-title">Demande d'emprunt</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
-                            <div class="modal-body">
-                                <div class="text-center">
-                                    <i class="fas fa-book fa-3x text-success mb-3"></i>
-                                    <h5>Emprunter ce livre ?</h5>
-                                    <p>Livre: "<strong>${livre.titre}</strong>"</p>
-                                    <p>Auteur: <strong>${livre.auteur.nom}</strong></p>
+                            <form action="/prets/request" method="post">
+                                <div class="modal-body">
+                                    <div class="text-center mb-4">
+                                        <i class="fas fa-book fa-3x text-success mb-3"></i>
+                                        <h5>Demander l'emprunt de ce livre ?</h5>
+                                        <p>Livre: "<strong>${livre.titre}</strong>"</p>
+                                        <p>Auteur: <strong>${livre.auteur.nom}</strong></p>
+                                    </div>
+                                    
+                                    <!-- Exemplaire Selection -->
+                                    <div class="mb-3">
+                                        <label for="exemplaireId${livre.id}" class="form-label">
+                                            <i class="fas fa-copy"></i> Choisir un exemplaire:
+                                        </label>
+                                        <select class="form-select" id="exemplaireId${livre.id}" name="exemplaireId" required>
+                                            <option value="">Sélectionner un exemplaire...</option>
+                                            <c:forEach var="exemplaire" items="${livre.exemplaires}">
+                                                <option value="${exemplaire.id}">
+                                                    Exemplaire #${exemplaire.id}
+                                                </option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Type de Prêt Selection -->
+                                    <div class="mb-3">
+                                        <label for="typePretId${livre.id}" class="form-label">
+                                            <i class="fas fa-clock"></i> Type de prêt:
+                                        </label>
+                                        <select class="form-select" id="typePretId${livre.id}" name="typePretId" required>
+                                            <option value="">Sélectionner le type de prêt...</option>
+                                            <c:forEach var="typePret" items="${typesPret}">
+                                                <option value="${typePret.id}">${typePret.libelle}</option>
+                                            </c:forEach>
+                                        </select>
+                                        <small class="form-text text-muted">
+                                            Votre durée d'emprunt dépend de votre type d'adhérent
+                                        </small>
+                                    </div>
                                     
                                     <!-- Show constraints if any -->
                                     <c:if test="${not empty livre.contraintes}">
                                         <div class="alert alert-warning">
                                             <h6><i class="fas fa-exclamation-triangle"></i> Contraintes d'emprunt:</h6>
                                             <c:forEach var="contrainte" items="${livre.contraintes}">
-                                                <small class="d-block">${contrainte.typeContrainte}</small>
+                                                <small class="d-block">• ${contrainte.typeContrainte}</small>
                                             </c:forEach>
                                         </div>
                                     </c:if>
                                     
-                                    <small class="text-muted">
-                                        Client: ${currentUser.numeroClient}
-                                    </small>
+                                    <div class="alert alert-info">
+                                        <small>
+                                            <i class="fas fa-info-circle"></i>
+                                            Votre demande sera soumise pour validation par un administrateur.
+                                        </small>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    <i class="fas fa-times"></i> Annuler
-                                </button>
-                                <form action="/client/emprunter" method="post" style="display: inline;">
-                                    <input type="hidden" name="livreId" value="${livre.id}">
-                                    <input type="hidden" name="numeroClient" value="${currentUser.numeroClient}">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-check"></i> Confirmer l'emprunt
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times"></i> Annuler
                                     </button>
-                                </form>
-                            </div>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-paper-plane"></i> Envoyer la demande
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -314,6 +346,25 @@
 
 <!-- Custom JavaScript for this page -->
 <script>
+    // Debug function to check if modals are working
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Page loaded, checking modals...');
+        
+        // Check if Bootstrap is loaded
+        if (typeof bootstrap !== 'undefined') {
+            console.log('Bootstrap is loaded');
+        } else {
+            console.error('Bootstrap is not loaded!');
+        }
+        
+        // Add event listeners to borrow buttons
+        document.querySelectorAll('.borrow-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                console.log('Borrow button clicked:', this.getAttribute('data-bs-target'));
+            });
+        });
+    });
+
     // Auto-hide alerts after 5 seconds
     setTimeout(function() {
         let alerts = document.querySelectorAll('.alert');

@@ -1,7 +1,11 @@
 package com.rtsmitia.bibliotheque.controllers;
 
 import com.rtsmitia.bibliotheque.models.User;
+import com.rtsmitia.bibliotheque.models.Livre;
+import com.rtsmitia.bibliotheque.models.Exemplaire;
 import com.rtsmitia.bibliotheque.services.LivreService;
+import com.rtsmitia.bibliotheque.services.TypePretService;
+import com.rtsmitia.bibliotheque.services.ExemplaireService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,16 +13,21 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequestMapping("/client")
 public class ClientController {
 
     private final LivreService livreService;
+    private final TypePretService typePretService;
+    private final ExemplaireService exemplaireService;
 
     @Autowired
-    public ClientController(LivreService livreService) {
+    public ClientController(LivreService livreService, TypePretService typePretService, ExemplaireService exemplaireService) {
         this.livreService = livreService;
+        this.typePretService = typePretService;
+        this.exemplaireService = exemplaireService;
     }
 
     /**
@@ -33,7 +42,16 @@ public class ClientController {
 
         User currentUser = (User) session.getAttribute("currentUser");
         
-        model.addAttribute("livres", livreService.getAllLivres());
+        // Get all books with their available exemplaires
+        List<Livre> livres = livreService.getAllLivres();
+        livres.forEach(livre -> {
+            // For each book, set only available exemplaires
+            List<Exemplaire> availableExemplaires = exemplaireService.getAvailableExemplairesByLivreId(livre.getId());
+            livre.setExemplaires(availableExemplaires);
+        });
+        
+        model.addAttribute("livres", livres);
+        model.addAttribute("typesPret", typePretService.getAllTypePrets());
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("contentPage", "client-livres");
         model.addAttribute("pageTitle", "Catalogue des Livres");
@@ -55,7 +73,16 @@ public class ClientController {
 
         User currentUser = (User) session.getAttribute("currentUser");
         
-        model.addAttribute("livres", livreService.searchByTitleOrAuthor(searchTerm));
+        // Get search results with their available exemplaires
+        List<Livre> livres = livreService.searchByTitleOrAuthor(searchTerm);
+        livres.forEach(livre -> {
+            // For each book, set only available exemplaires
+            List<Exemplaire> availableExemplaires = exemplaireService.getAvailableExemplairesByLivreId(livre.getId());
+            livre.setExemplaires(availableExemplaires);
+        });
+        
+        model.addAttribute("livres", livres);
+        model.addAttribute("typesPret", typePretService.getAllTypePrets());
         model.addAttribute("searchTerm", searchTerm);
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("contentPage", "client-livres");

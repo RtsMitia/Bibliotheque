@@ -64,3 +64,12 @@ INSERT INTO auteur (nom) VALUES
 ('Haruki Murakami'),
 ('Umberto Eco');
 
+---Type de Prêt
+INSERT INTO type_pret (libelle) VALUES 
+('a emporter'),
+('lire sur place');
+
+---Quota Prêt
+INSERT INTO quota_pret (nombre_livre, nombre_jour_pret, date_changement, id_type_adherant) VALUES 
+(5, 10, CURRENT_DATE, 1), -- etudiant: 5 livres, 10 jours
+(7, 5, CURRENT_DATE, 2);  -- professionel: 7 livres, 5 jours

@@ -75,6 +75,16 @@ public class Exemplaire {
         this.prets = prets;
     }
 
+    /**
+     * Get dateArrivee as java.util.Date for JSP formatting
+     */
+    public java.util.Date getDateArriveeAsDate() {
+        if (dateArrivee == null) {
+            return null;
+        }
+        return java.util.Date.from(dateArrivee.atZone(java.time.ZoneId.systemDefault()).toInstant());
+    }
+
     @Override
     public String toString() {
         return "Exemplaire{" +
