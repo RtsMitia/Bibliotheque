@@ -219,21 +219,86 @@
 <div class="sidebar">
     <h1>My Library</h1>
     <nav class="sidebar-nav">
-        <a href="${pageContext.request.contextPath}/"><i class="fas fa-home"></i> Home</a>
-        <a href="${pageContext.request.contextPath}/adherents/new"><i class="fas fa-user-plus"></i> Add Adherent</a>
-        <a href="${pageContext.request.contextPath}/adherents/inscription-a-valider"><i class="fas fa-user-check"></i> Inscription à Valider</a>
-        
-        <!-- Livres Section with Dropdown -->
-        <div class="nav-section">
-            <button class="nav-section-header" onclick="toggleSection('livres-section')">
-                <span><i class="fas fa-book"></i> Livres</span>
-                <i class="fas fa-chevron-down dropdown-arrow"></i>
-            </button>
-            <div class="nav-section-content" id="livres-section">
-                <a href="${pageContext.request.contextPath}/livres/list"><i class="fas fa-list"></i> Liste des Livres</a>
-                <a href="${pageContext.request.contextPath}/livres/add"><i class="fas fa-plus"></i> Ajouter un Livre</a>
-            </div>
-        </div>
+        <!-- Check if user is logged in -->
+        <c:choose>
+            <c:when test="${not empty sessionScope.currentUser}">
+                <!-- User is logged in -->
+                <c:choose>
+                    <c:when test="${sessionScope.currentUser.admin}">
+                        <!-- Admin Navigation -->
+                        <div class="user-info mb-3 p-2" style="background: rgba(255,255,255,0.1); border-radius: 5px;">
+                            <small><i class="fas fa-user-shield"></i> Admin connecté</small>
+                        </div>
+                        <a href="${pageContext.request.contextPath}/livres/list"><i class="fas fa-home"></i> Dashboard</a>
+                        <a href="${pageContext.request.contextPath}/adherents/new"><i class="fas fa-user-plus"></i> Add Adherent</a>
+                        <a href="${pageContext.request.contextPath}/adherents/inscription-a-valider"><i class="fas fa-user-check"></i> Inscription à Valider</a>
+                        
+                        <!-- Livres Section with Dropdown -->
+                        <div class="nav-section">
+                            <button class="nav-section-header" onclick="toggleSection('livres-section')">
+                                <span><i class="fas fa-book"></i> Livres</span>
+                                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                            </button>
+                            <div class="nav-section-content" id="livres-section">
+                                <a href="${pageContext.request.contextPath}/livres/list"><i class="fas fa-list"></i> Liste des Livres</a>
+                                <a href="${pageContext.request.contextPath}/livres/add"><i class="fas fa-plus"></i> Ajouter un Livre</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Exemplaires Section -->
+                        <div class="nav-section">
+                            <button class="nav-section-header" onclick="toggleSection('exemplaires-section')">
+                                <span><i class="fas fa-copy"></i> Exemplaires</span>
+                                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                            </button>
+                            <div class="nav-section-content" id="exemplaires-section">
+                                <a href="${pageContext.request.contextPath}/exemplaires/list"><i class="fas fa-list"></i> Liste des Exemplaires</a>
+                                <a href="${pageContext.request.contextPath}/exemplaires/add"><i class="fas fa-plus"></i> Ajouter un Exemplaire</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Logout -->
+                        <form action="${pageContext.request.contextPath}/logout" method="post" style="margin-top: auto;">
+                            <button type="submit" class="nav-section-header w-100 text-start" style="border: none; background: #e74c3c; color: white;">
+                                <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                            </button>
+                        </form>
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Client Navigation -->
+                        <div class="user-info mb-3 p-2" style="background: rgba(40,167,69,0.2); border-radius: 5px;">
+                            <small>
+                                <i class="fas fa-user"></i> 
+                                <c:choose>
+                                    <c:when test="${not empty sessionScope.currentUser.adherentInfo}">
+                                        ${sessionScope.currentUser.adherentInfo}
+                                    </c:when>
+                                    <c:otherwise>
+                                        Client: ${sessionScope.currentUser.numeroClient}
+                                    </c:otherwise>
+                                </c:choose>
+                            </small>
+                            <c:if test="${not empty sessionScope.currentUser.adherentInfo}">
+                                <br><small style="opacity: 0.8;">N° ${sessionScope.currentUser.numeroClient}</small>
+                            </c:if>
+                        </div>
+                        <a href="${pageContext.request.contextPath}/client/livres"><i class="fas fa-book"></i> Catalogue des Livres</a>
+                        <a href="${pageContext.request.contextPath}/client/profile"><i class="fas fa-user"></i> Mon Profil</a>
+                        
+                        <!-- Logout -->
+                        <form action="${pageContext.request.contextPath}/logout" method="post" style="margin-top: auto;">
+                            <button type="submit" class="nav-section-header w-100 text-start" style="border: none; background: #e74c3c; color: white;">
+                                <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                            </button>
+                        </form>
+                    </c:otherwise>
+                </c:choose>
+            </c:when>
+            <c:otherwise>
+                <!-- Not logged in - minimal navigation -->
+                <a href="${pageContext.request.contextPath}/login"><i class="fas fa-sign-in-alt"></i> Se connecter</a>
+            </c:otherwise>
+        </c:choose>
     </nav>
 </div>
 

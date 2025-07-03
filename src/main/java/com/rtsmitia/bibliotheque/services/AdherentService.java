@@ -20,6 +20,12 @@ public class AdherentService {
     private final AdherentAbonnementService abonnementService;
     
     @Autowired
+    private PenaliteService penaliteService;
+    
+    @Autowired
+    private QuotaService quotaService;
+    
+    @Autowired
     public AdherentService(AdherentRepository adherentRepository, 
                           HistoriqueStatutAbonnementService historiqueStatutService,
                           AdherentAbonnementService abonnementService) {
@@ -86,5 +92,56 @@ public class AdherentService {
         List<Adherent> adherentsWithDemande = getAdherentsWithStatusDemande();
         return adherentsWithDemande.stream()
                 .anyMatch(a -> a.getId().equals(adherent.getId()));
+    }
+    
+    /**
+     * Validate client number and return adherent if valid
+     */
+    public Optional<Adherent> validateClientNumber(String numeroAdherent) {
+        return adherentRepository.findByNumeroAdherent(numeroAdherent);
+    }
+    
+    /**
+     * Check if adherent has valid subscription status
+     */
+    public boolean hasValidSubscription(Adherent adherent) {
+        // Check if adherent has 'valide' status (active subscription)
+        List<Adherent> validAdherents = getAdherentsByStatut(StatutAbonnement.valide);
+        return validAdherents.stream()
+                .anyMatch(a -> a.getId().equals(adherent.getId()));
+    }
+    
+    /**
+     * Check if adherent can borrow books (has valid subscription and no penalties)
+     */
+    public boolean canBorrowBooks(Adherent adherent) {
+        return hasValidSubscription(adherent) && penaliteService.canBorrow(adherent);
+    }
+    
+    /**
+     * Get borrowing information for an adherent
+     */
+    public String getBorrowingStatus(Adherent adherent) {
+        if (!hasValidSubscription(adherent)) {
+            return "Abonnement non valide";
+        }
+        
+        if (penaliteService.hasActivePenalties(adherent)) {
+            return "Pénalité en cours";
+        }
+        
+        return "Peut emprunter";
+    }
+    
+    /**
+     * Get quota information for an adherent
+     */
+    public String getQuotaInfo(Adherent adherent) {
+        int maxBooks = quotaService.getMaxBooksAllowed(adherent);
+        int maxDays = quotaService.getMaxLoanDays(adherent);
+        int maxReservations = quotaService.getMaxReservationsAllowed(adherent);
+        
+        return String.format("Max livres: %d, Durée: %d jours, Max réservations: %d", 
+                           maxBooks, maxDays, maxReservations);
     }
 }

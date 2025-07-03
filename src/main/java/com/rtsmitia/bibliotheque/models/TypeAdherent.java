@@ -17,6 +17,15 @@ public class TypeAdherent {
     @OneToMany(mappedBy = "typeAdherent", cascade = CascadeType.ALL)
     private List<Adherent> adherents;
 
+    @OneToMany(mappedBy = "typeAdherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<QuotaPret> quotaPrets;
+
+    @OneToMany(mappedBy = "typeAdherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<QuotaReservation> quotaReservations;
+
+    @OneToMany(mappedBy = "typeAdherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PenaliteConfig> penaliteConfigs;
+
     // === Getters and Setters ===
     public Long getId() {
         return id;
@@ -40,5 +49,29 @@ public class TypeAdherent {
 
     public void setAdherents(List<Adherent> adherents) {
         this.adherents = adherents;
+    }
+
+    public List<QuotaPret> getQuotaPrets() {
+        return quotaPrets;
+    }
+
+    public void setQuotaPrets(List<QuotaPret> quotaPrets) {
+        this.quotaPrets = quotaPrets;
+    }
+
+    public List<QuotaReservation> getQuotaReservations() {
+        return quotaReservations;
+    }
+
+    public void setQuotaReservations(List<QuotaReservation> quotaReservations) {
+        this.quotaReservations = quotaReservations;
+    }
+
+    public List<PenaliteConfig> getPenaliteConfigs() {
+        return penaliteConfigs;
+    }
+
+    public void setPenaliteConfigs(List<PenaliteConfig> penaliteConfigs) {
+        this.penaliteConfigs = penaliteConfigs;
     }
 }
