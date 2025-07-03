@@ -23,4 +23,9 @@ public interface PenaliteConfigRepository extends JpaRepository<PenaliteConfig, 
      */
     @Query("SELECT pc FROM PenaliteConfig pc WHERE pc.typeAdherent = :typeAdherent ORDER BY pc.dateChangement DESC")
     java.util.List<PenaliteConfig> findAllByTypeAdherent(@Param("typeAdherent") TypeAdherent typeAdherent);
+    
+    /**
+     * Find penalty configuration by adherent type
+     */
+    Optional<PenaliteConfig> findByTypeAdherent(TypeAdherent typeAdherent);
 }

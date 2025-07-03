@@ -83,6 +83,9 @@
                 <p class="mb-0">Découvrez et empruntez nos livres</p>
             </div>
             <div class="col-auto">
+                <a href="/client/mes-emprunts" class="btn btn-outline-light me-2">
+                    <i class="fas fa-book-reader"></i> Mes Emprunts
+                </a>
                 <form action="/logout" method="post" style="display: inline;">
                     <button type="submit" class="btn btn-light">
                         <i class="fas fa-sign-out-alt"></i> Se déconnecter

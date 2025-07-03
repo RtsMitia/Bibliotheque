@@ -73,3 +73,8 @@ INSERT INTO type_pret (libelle) VALUES
 INSERT INTO quota_pret (nombre_livre, nombre_jour_pret, date_changement, id_type_adherant) VALUES 
 (5, 10, CURRENT_DATE, 1), -- etudiant: 5 livres, 10 jours
 (7, 5, CURRENT_DATE, 2);  -- professionel: 7 livres, 5 jours
+
+---Pénalité Configuration
+INSERT INTO penalite_config (nombre_jour, date_changement, id_type_adherent) VALUES 
+(7, CURRENT_DATE, 1),  -- etudiant: 7 jours de pénalité
+(3, CURRENT_DATE, 2);  -- professionel: 3 jours de pénalité

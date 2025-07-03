@@ -132,6 +132,14 @@ public class PretService {
             return new LoanEligibilityResult(false, "Abonnement non valide");
         }
         
+        // Check if adherent has overdue books
+        List<Pret> overdueLoans = pretRepository.findOverdueLoansForAdherent(adherent);
+        if (!overdueLoans.isEmpty()) {
+            return new LoanEligibilityResult(false, 
+                String.format("Vous avez %d livre(s) en retard. Veuillez les retourner avant d'emprunter.", 
+                    overdueLoans.size()));
+        }
+        
         // Check if adherent has active penalties
         if (penaliteService.hasActivePenalties(adherent)) {
             return new LoanEligibilityResult(false, "Pénalité en cours - impossible d'emprunter");
@@ -235,6 +243,48 @@ public class PretService {
     }
     
     /**
+     * Return a book with custom date and penalty calculation
+     */
+    @Transactional
+    public BookReturnResult returnBookWithDate(Long pretId, LocalDateTime returnDate, Adherent adherent) {
+        Optional<Pret> pretOpt = pretRepository.findById(pretId);
+        if (pretOpt.isEmpty()) {
+            return new BookReturnResult(false, "Prêt introuvable");
+        }
+        
+        Pret pret = pretOpt.get();
+        
+        // Check if the loan belongs to the adherent
+        if (!pret.getAdherent().getId().equals(adherent.getId())) {
+            return new BookReturnResult(false, "Ce prêt ne vous appartient pas");
+        }
+        
+        // Check if already returned
+        if (pret.getDateRetour() != null) {
+            return new BookReturnResult(false, "Ce livre a déjà été retourné");
+        }
+        
+        // Set return date
+        pret.setDateRetour(returnDate);
+        pretRepository.save(pret);
+        
+        // Mark exemplaire as available again
+        exemplaireService.markAsAvailable(pret.getExemplaire());
+        
+        // Check if return is late and apply penalty if needed
+        if (pret.getDateFin() != null && returnDate.isAfter(pret.getDateFin())) {
+            long daysLate = java.time.temporal.ChronoUnit.DAYS.between(pret.getDateFin().toLocalDate(), returnDate.toLocalDate());
+            String penaltyMessage = penaliteService.applyLatePenalty(adherent, (int) daysLate);
+            
+            return new BookReturnResult(true, 
+                String.format("Livre retourné avec succès. ATTENTION: Retour en retard de %d jour(s). %s", 
+                    daysLate, penaltyMessage));
+        }
+        
+        return new BookReturnResult(true, "Livre retourné avec succès dans les délais.");
+    }
+
+    /**
      * Get all loans for an adherent
      */
     public List<Pret> getLoansForAdherent(Adherent adherent) {
@@ -280,5 +330,18 @@ public class PretService {
         
         public boolean isEligible() { return eligible; }
         public String getReason() { return reason; }
+    }
+    
+    public static class BookReturnResult {
+        private boolean successful;
+        private String message;
+        
+        public BookReturnResult(boolean successful, String message) {
+            this.successful = successful;
+            this.message = message;
+        }
+        
+        public boolean isSuccessful() { return successful; }
+        public String getMessage() { return message; }
     }
 }

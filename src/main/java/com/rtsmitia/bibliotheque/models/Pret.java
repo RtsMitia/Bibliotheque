@@ -167,6 +167,30 @@ public class Pret {
         return currentStatus != null && currentStatus.isPending();
     }
 
+    // Utility methods for JSP
+    public java.util.Date getDateDebutAsDate() {
+        return dateDebut != null ? java.sql.Timestamp.valueOf(dateDebut) : null;
+    }
+    
+    public java.util.Date getDateFinAsDate() {
+        return dateFin != null ? java.sql.Timestamp.valueOf(dateFin) : null;
+    }
+    
+    public java.util.Date getDateRetourAsDate() {
+        return dateRetour != null ? java.sql.Timestamp.valueOf(dateRetour) : null;
+    }
+    
+    public long getDaysDifference() {
+        if (dateFin == null) return 0;
+        LocalDateTime now = LocalDateTime.now();
+        return java.time.temporal.ChronoUnit.DAYS.between(now.toLocalDate(), dateFin.toLocalDate());
+    }
+    
+    public boolean isDueSoon() {
+        long diff = getDaysDifference();
+        return diff >= 0 && diff <= 2;
+    }
+
     @Override
     public String toString() {
         return "Pret{" +

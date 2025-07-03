@@ -62,4 +62,10 @@ public interface PretRepository extends JpaRepository<Pret, Long> {
     @Query("SELECT DISTINCT p FROM Pret p JOIN p.statutsPret sp WHERE p.adherent = :adherent AND sp.statut = :statut " +
            "AND sp.dateChangement = (SELECT MAX(sp2.dateChangement) FROM StatutPret sp2 WHERE sp2.pret = p)")
     List<Pret> findByAdherentAndStatus(@Param("adherent") Adherent adherent, @Param("statut") StatutPretEnum statut);
+    
+    /**
+     * Find overdue loans for a specific adherent
+     */
+    @Query("SELECT p FROM Pret p WHERE p.adherent = :adherent AND p.dateRetour IS NULL AND p.dateFin < CURRENT_TIMESTAMP")
+    List<Pret> findOverdueLoansForAdherent(@Param("adherent") Adherent adherent);
 }
