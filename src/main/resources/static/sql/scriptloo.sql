@@ -181,17 +181,31 @@ CREATE TABLE statut_prolongement(
    FOREIGN KEY(id_prolongement) REFERENCES prolongement(id)
 );
 
-CREATE TABLE contraint(
-   id SERIAL PRIMARY KEY,
-   age INT,
-   id_livre SMALLINT NOT NULL,
-   FOREIGN KEY(id_livre) REFERENCES livre(id)
-);
-
 CREATE TABLE livre_genre(
+   id SERIAL PRIMARY KEY,
    id_livre SMALLINT,
    id_genre SMALLINT,
-   PRIMARY KEY(id_livre, id_genre),
    FOREIGN KEY(id_livre) REFERENCES livre(id),
    FOREIGN KEY(id_genre) REFERENCES genre(id)
+);
+
+CREATE TABLE les_contraint(
+   id SERIAL PRIMARY KEY,
+   type_contrainte VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE livre_contraint(
+   id SERIAL PRIMARY KEY,
+   id_livre SMALLINT,
+   id_contraint SMALLINT,
+   FOREIGN KEY(id_livre) REFERENCES livre(id),
+   FOREIGN KEY(id_contraint) REFERENCES les_contraint(id)
+);
+
+CREATE TABLE contraint_adherant(
+   id SERIAL PRIMARY KEY,
+   numero_adherent SMALLINT,
+   id_contraint SMALLINT,
+   FOREIGN KEY(numero_adherent) REFERENCES adherents(id),
+   FOREIGN KEY(id_contraint) REFERENCES les_contraint(id)
 );
