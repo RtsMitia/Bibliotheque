@@ -45,6 +45,9 @@ public class Adherent {
     @OneToMany(mappedBy = "adherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<HistoriqueStatutAbonnement> historiqueStatuts;
 
+    @OneToMany(mappedBy = "adherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Penalite> penalites;
+
     @ManyToMany
     @JoinTable(
         name = "contraint_adherant",
@@ -56,6 +59,7 @@ public class Adherent {
     // Default constructor
     public Adherent() {
         this.contraintes = new ArrayList<>();
+        this.penalites = new ArrayList<>();
     }
 
     // === Constructor to auto-set date_inscription ===
@@ -146,6 +150,14 @@ public class Adherent {
 
     public void setHistoriqueStatuts(List<HistoriqueStatutAbonnement> historiqueStatuts) {
         this.historiqueStatuts = historiqueStatuts;
+    }
+
+    public List<Penalite> getPenalites() {
+        return penalites;
+    }
+
+    public void setPenalites(List<Penalite> penalites) {
+        this.penalites = penalites;
     }
 
     public List<LesContraints> getContraintes() {

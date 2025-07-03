@@ -62,7 +62,7 @@ public class LoginController {
 
             Adherent adherent = adherentOpt.get();
 
-            // Check if the adherent has a valid subscription
+            // Check if the adherent has a valid subscription and can borrow
             if (!adherentService.hasValidSubscription(adherent)) {
                 redirectAttributes.addFlashAttribute("errorMessage", 
                     "Votre abonnement n'est pas actif. Veuillez contacter l'administration.");
@@ -75,8 +75,14 @@ public class LoginController {
             session.setAttribute("currentUser", user);
             session.setAttribute("currentAdherent", adherent);
 
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "Connexion réussie ! Bienvenue, " + adherent.getPrenom() + " " + adherent.getNom());
+            // Add borrowing status info
+            String borrowingStatus = adherentService.getBorrowingStatus(adherent);
+            String quotaInfo = adherentService.getQuotaInfo(adherent);
+            
+            String welcomeMessage = String.format("Connexion réussie ! Bienvenue, %s %s. Statut: %s. %s", 
+                                                adherent.getPrenom(), adherent.getNom(), borrowingStatus, quotaInfo);
+            
+            redirectAttributes.addFlashAttribute("successMessage", welcomeMessage);
             return "redirect:/client/livres";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", 

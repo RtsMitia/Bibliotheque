@@ -102,6 +102,14 @@ CREATE TABLE historique_statut_abonnement(
    FOREIGN KEY(numero_adherent) REFERENCES adherents(id)
 );
 
+CREATE TABLE statut_pret(
+   id SERIAL PRIMARY KEY,
+   statut VARCHAR(20) CHECK (statut IN ('demande', 'en attente', 'valide', 'refuse')) NOT NULL,
+   date_changement VARCHAR(50),
+   id_pret SMALLINT NOT NULL,
+   FOREIGN KEY(id_pret) REFERENCES pret(id)
+);
+
 CREATE TABLE livre(
    id SERIAL PRIMARY KEY,
    titre VARCHAR(255),
