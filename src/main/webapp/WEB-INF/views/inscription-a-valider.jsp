@@ -154,6 +154,7 @@
                             <th>Téléphone</th>
                             <th>Type</th>
                             <th>Date Inscription</th>
+                            <th>Date Changement</th>
                             <th>Statut</th>
                             <th>Actions</th>
                         </tr>
@@ -167,16 +168,29 @@
                                 <td>${adherent.email}</td>
                                 <td>${adherent.telephone != null ? adherent.telephone : '-'}</td>
                                 <td>${adherent.typeAdherent.libelle}</td>
+                                <td>${adherent.dateInscriptionAsDate}</td>
                                 <td>
-                                    ${adherent.formattedDateInscription}
+                                    <input type="datetime-local" 
+                                           id="dateChangement_${adherent.id}"
+                                           value="${adherent.formattedDateInscription}" 
+                                           style="padding: 0.25rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.875rem; width: 100%;" />
                                 </td>
                                 <td>
                                     <span class="status-badge">En demande</span>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="#" class="btn btn-view" title="Voir les détails">Voir</a>
-                                        <a href="${pageContext.request.contextPath}/adherents/approve-adherent/${adherent.id}" class="btn btn-approve" title="Approuver l'inscription">Approuver</a>
+                                        <form method="post" 
+                                              action="${pageContext.request.contextPath}/adherents/approve-adherent/${adherent.id}" 
+                                              style="display: inline-block; margin: 0;">
+                                            <input type="hidden" name="dateChangement" value="" />
+                                            <button type="submit" 
+                                                    class="btn btn-approve" 
+                                                    title="Approuver l'inscription"
+                                                    onclick="this.form.dateChangement.value = document.getElementById('dateChangement_${adherent.id}').value;">
+                                                Approuver
+                                            </button>
+                                        </form>
                                         <a href="#" class="btn btn-reject" title="Rejeter l'inscription">Rejeter</a>
                                     </div>
                                 </td>

@@ -1,6 +1,7 @@
 package com.rtsmitia.bibliotheque.services;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,11 @@ public class HistoriqueStatutAbonnementService {
         this.historiqueRepository = historiqueRepository;
     }
     
-    public HistoriqueStatutAbonnement createStatusHistory(Adherent adherent, StatutAbonnement statut) {
+    public HistoriqueStatutAbonnement createStatusHistory(Adherent adherent, StatutAbonnement statut, LocalDateTime dateChangement) {
         HistoriqueStatutAbonnement historique = new HistoriqueStatutAbonnement();
         historique.setAdherent(adherent);
         historique.setStatut(statut);
-        historique.setDateChangement(LocalDate.now());
+        historique.setDateChangement(dateChangement);
         
         return historiqueRepository.save(historique);
     }

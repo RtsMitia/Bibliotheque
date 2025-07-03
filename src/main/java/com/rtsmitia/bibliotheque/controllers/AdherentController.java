@@ -1,8 +1,10 @@
 package com.rtsmitia.bibliotheque.controllers;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,10 +12,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.rtsmitia.bibliotheque.models.Adherent;
 import com.rtsmitia.bibliotheque.services.AdherentService;
+import com.rtsmitia.bibliotheque.services.LesContraintsService;
 import com.rtsmitia.bibliotheque.services.TypeAdherentService;
 
 @Controller
@@ -22,18 +26,22 @@ public class AdherentController {
 
     private final AdherentService adherentService;
     private final TypeAdherentService typeAdherentService;
+    private final LesContraintsService contraintsService;
 
     @Autowired
      public AdherentController(AdherentService adherentService,
-                              TypeAdherentService typeAdherentService) {
+                              TypeAdherentService typeAdherentService,
+                              LesContraintsService contraintsService) {
         this.adherentService = adherentService;
         this.typeAdherentService = typeAdherentService;
+        this.contraintsService = contraintsService;
     }
 
     @GetMapping("/new")
     public String showForm(Model model) {
         model.addAttribute("adherent", new Adherent());
         model.addAttribute("typesAdherents", typeAdherentService.getAllTypes());
+        model.addAttribute("contraintes", contraintsService.getAllContraintes());
         model.addAttribute("contentPage", "adherent-form");
 
         return "layout";
@@ -42,7 +50,7 @@ public class AdherentController {
     @PostMapping("/save")
     public String saveAdherent(@ModelAttribute Adherent adherent, Model model) {
         try {
-            adherentService.saveAdherent(adherent);
+            adherentService.saveAdherent(adherent, adherent.getDateInscription());
             model.addAttribute("successMessage", "Adhérent enregistré avec succès !");
             model.addAttribute("adherent", new Adherent()); // empty form for next input
         } catch (IllegalArgumentException e) {
@@ -50,6 +58,7 @@ public class AdherentController {
             model.addAttribute("adherent", adherent); // preserve form values
         }
         model.addAttribute("typesAdherents", typeAdherentService.getAllTypes());
+        model.addAttribute("contraintes", contraintsService.getAllContraintes());
         model.addAttribute("contentPage", "adherent-form");
 
         return "layout";
@@ -75,10 +84,12 @@ public class AdherentController {
         return adherentService.getAllAdherents();
     }
     
-    @GetMapping("/approve-adherent/{id}")
-    public String approveAdherant(@PathVariable Long id, Model model) {
+    @PostMapping("/approve-adherent/{id}")
+    public String approveAdherant(@PathVariable Long id, 
+                                 @RequestParam("dateChangement") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateChangement,
+                                 Model model) {
         try {
-            adherentService.approveAdherent(id);
+            adherentService.approveAdherent(id, dateChangement);
         } catch (IllegalArgumentException e) {
             
         }

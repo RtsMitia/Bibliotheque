@@ -2,6 +2,7 @@ package com.rtsmitia.bibliotheque.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "historique_statut_abonnement")
@@ -16,7 +17,7 @@ public class HistoriqueStatutAbonnement {
     private StatutAbonnement statut;
 
     @Column(name = "date_changement", nullable = false)
-    private LocalDate dateChangement;
+    private LocalDateTime dateChangement;
 
     @ManyToOne
     @JoinColumn(name = "numero_adherent", nullable = false)
@@ -47,7 +48,7 @@ public class HistoriqueStatutAbonnement {
     // Constructor
     public HistoriqueStatutAbonnement() {}
 
-    public HistoriqueStatutAbonnement(StatutAbonnement statut, LocalDate dateChangement, Adherent adherent) {
+    public HistoriqueStatutAbonnement(StatutAbonnement statut, LocalDateTime dateChangement, Adherent adherent) {
         this.statut = statut;
         this.dateChangement = dateChangement;
         this.adherent = adherent;
@@ -70,12 +71,12 @@ public class HistoriqueStatutAbonnement {
         this.statut = statut;
     }
 
-    public LocalDate getDateChangement() {
+    public LocalDateTime getDateChangement() {
         return dateChangement;
     }
 
-    public void setDateChangement(LocalDate dateChangement) {
-        this.dateChangement = dateChangement;
+    public void setDateChangement(LocalDateTime dateChangement2) {
+        this.dateChangement = dateChangement2;
     }
 
     public Adherent getAdherent() {

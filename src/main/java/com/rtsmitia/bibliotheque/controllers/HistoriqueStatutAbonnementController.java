@@ -1,5 +1,5 @@
 package com.rtsmitia.bibliotheque.controllers;
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +48,13 @@ public class HistoriqueStatutAbonnementController {
 
     @PostMapping("/create")
     public HistoriqueStatutAbonnement createStatusHistory(@RequestParam Long adherentId, 
-                                                         @RequestParam StatutAbonnement statut) {
+                                                         @RequestParam StatutAbonnement statut, LocalDateTime datechangement) {
         List<Adherent> allAdherents = adherentService.getAllAdherents();
         Adherent adherent = allAdherents.stream()
                 .filter(a -> a.getId().equals(adherentId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Adherent not found with ID: " + adherentId));
         
-        return historiqueService.createStatusHistory(adherent, statut);
+        return historiqueService.createStatusHistory(adherent, statut, datechangement);
     }
 }

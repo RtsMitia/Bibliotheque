@@ -1,9 +1,11 @@
 package com.rtsmitia.bibliotheque.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,23 +17,26 @@ import com.rtsmitia.bibliotheque.repositories.AdherentRepository;
 public class AdherentService {
     private final AdherentRepository adherentRepository;
     private final HistoriqueStatutAbonnementService historiqueStatutService;
+    private final AdherentAbonnementService abonnementService;
     
     @Autowired
     public AdherentService(AdherentRepository adherentRepository, 
-                          HistoriqueStatutAbonnementService historiqueStatutService) {
+                          HistoriqueStatutAbonnementService historiqueStatutService,
+                          AdherentAbonnementService abonnementService) {
         this.adherentRepository = adherentRepository;
         this.historiqueStatutService = historiqueStatutService;
+        this.abonnementService = abonnementService;
     }
 
     @Transactional
-    public Adherent saveAdherent(Adherent adherent) {
+    public Adherent saveAdherent(Adherent adherent, LocalDateTime dateInscription) {
         Optional<Adherent> existingAdherent = adherentRepository.findByEmail(adherent.getEmail());
         if (existingAdherent.isPresent()) {
             throw new IllegalArgumentException("Un adhérent avec cet email existe déjà.");
         } else {
             Adherent savedAdherent = adherentRepository.save(adherent);
             
-            historiqueStatutService.createStatusHistory(savedAdherent, StatutAbonnement.demande);
+            historiqueStatutService.createStatusHistory(savedAdherent, StatutAbonnement.demande, dateInscription);
             
             return savedAdherent;
         }
@@ -50,7 +55,7 @@ public class AdherentService {
     }
     
     @Transactional
-    public void approveAdherent(Long adherentId) {
+    public void approveAdherent(Long adherentId, LocalDateTime dateChangement) {
         Adherent adherent = adherentRepository.findById(adherentId.intValue())
                 .orElseThrow(() -> new IllegalArgumentException("Adherent not found with ID: " + adherentId));
         
@@ -58,11 +63,15 @@ public class AdherentService {
             throw new IllegalArgumentException("Cet adhérent n'est pas en attente de validation");
         }
         
-        historiqueStatutService.createStatusHistory(adherent, StatutAbonnement.valide);
+        // Update status to 'valide'
+        historiqueStatutService.createStatusHistory(adherent, StatutAbonnement.valide, dateChangement);
+        
+        // Create abonnement (1 year subscription by default)
+        abonnementService.createAbonnement(adherent, dateChangement);
     }
     
     @Transactional
-    public void rejectAdherent(Long adherentId) {
+    public void rejectAdherent(Long adherentId, LocalDateTime dateChangement) {
         Adherent adherent = adherentRepository.findById(adherentId.intValue())
                 .orElseThrow(() -> new IllegalArgumentException("Adherent not found with ID: " + adherentId));
         
@@ -70,7 +79,7 @@ public class AdherentService {
             throw new IllegalArgumentException("Cet adhérent n'est pas en attente de validation");
         }
         
-        historiqueStatutService.createStatusHistory(adherent, StatutAbonnement.refuse);
+        historiqueStatutService.createStatusHistory(adherent, StatutAbonnement.refuse, dateChangement);
     }
     
     private boolean isAdherentInDemande(Adherent adherent) {
