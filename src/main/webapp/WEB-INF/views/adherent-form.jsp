@@ -89,6 +89,36 @@
         margin-top: 1rem;
     }
     
+    /* Checkbox styles */
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+    }
+    
+    .checkbox-label {
+        margin: 0 !important;
+        font-weight: normal !important;
+        cursor: pointer;
+        user-select: none;
+    }
+    
+    .checkbox-label:hover {
+        color: #3498db;
+    }
+    
     .btn {
         display: inline-block;
         background-color: #3498db;
@@ -154,7 +184,24 @@
             <label>Adresse:</label>
             <form:textarea path="adresse" cssClass="form-control" />
         </div>
+        
+        <div class="form-group">
+            <label>Date d'inscription:</label>
+            <form:input path="dateInscription" type="datetime-local" cssClass="form-control" />
+        </div>
 
+        <div class="form-group full-width">
+            <label>Contraintes:</label>
+            <div class="checkbox-group">
+                <c:forEach var="contrainte" items="${contraintes}">
+                    <div class="checkbox-item">
+                        <form:checkbox path="contraintes" value="${contrainte.id}" id="contrainte_${contrainte.id}" />
+                        <label for="contrainte_${contrainte.id}" class="checkbox-label">${contrainte.typeContrainte}</label>
+                    </div>
+                </c:forEach>
+            </div>
+        </div>
+        
         <div class="btn-container">
             <button type="submit" class="btn">Save</button>
         </div>

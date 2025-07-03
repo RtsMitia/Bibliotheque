@@ -1,8 +1,12 @@
 package com.rtsmitia.bibliotheque.models;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "adherents")
@@ -35,7 +39,24 @@ public class Adherent {
     private String adresse;
 
     @Column(name = "date_inscription")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime dateInscription;
+
+    @OneToMany(mappedBy = "adherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<HistoriqueStatutAbonnement> historiqueStatuts;
+
+    @ManyToMany
+    @JoinTable(
+        name = "contraint_adherant",
+        joinColumns = @JoinColumn(name = "numero_adherent"),
+        inverseJoinColumns = @JoinColumn(name = "id_contraint")
+    )
+    private List<LesContraints> contraintes;
+
+    // Default constructor
+    public Adherent() {
+        this.contraintes = new ArrayList<>();
+    }
 
     // === Constructor to auto-set date_inscription ===
     @PrePersist
@@ -117,5 +138,37 @@ public class Adherent {
 
     public void setDateInscription(LocalDateTime dateInscription) {
         this.dateInscription = dateInscription;
+    }
+
+    public List<HistoriqueStatutAbonnement> getHistoriqueStatuts() {
+        return historiqueStatuts;
+    }
+
+    public void setHistoriqueStatuts(List<HistoriqueStatutAbonnement> historiqueStatuts) {
+        this.historiqueStatuts = historiqueStatuts;
+    }
+
+    public List<LesContraints> getContraintes() {
+        return contraintes;
+    }
+
+    public void setContraintes(List<LesContraints> contraintes) {
+        this.contraintes = contraintes;
+    }
+    
+    public String getFormattedDateInscription() {
+        if (this.dateInscription == null) {
+            return "";
+        }
+        return String.format("%02d/%02d/%d %02d:%02d", 
+                this.dateInscription.getDayOfMonth(),
+                this.dateInscription.getMonthValue(),
+                this.dateInscription.getYear(),
+                this.dateInscription.getHour(),
+                this.dateInscription.getMinute());
+    }
+    // Add this for JSP compatibility
+    public Date getDateInscriptionAsDate() {
+        return Date.from(dateInscription.atZone(ZoneId.systemDefault()).toInstant());
     }
 }
