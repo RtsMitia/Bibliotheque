@@ -3,9 +3,12 @@ package com.rtsmitia.bibliotheque.controllers;
 import com.rtsmitia.bibliotheque.models.User;
 import com.rtsmitia.bibliotheque.models.Livre;
 import com.rtsmitia.bibliotheque.models.Exemplaire;
+import com.rtsmitia.bibliotheque.models.Adherent;
+import com.rtsmitia.bibliotheque.models.Pret;
 import com.rtsmitia.bibliotheque.services.LivreService;
 import com.rtsmitia.bibliotheque.services.TypePretService;
 import com.rtsmitia.bibliotheque.services.ExemplaireService;
+import com.rtsmitia.bibliotheque.services.PretService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,12 +25,14 @@ public class ClientController {
     private final LivreService livreService;
     private final TypePretService typePretService;
     private final ExemplaireService exemplaireService;
+    private final PretService pretService;
 
     @Autowired
-    public ClientController(LivreService livreService, TypePretService typePretService, ExemplaireService exemplaireService) {
+    public ClientController(LivreService livreService, TypePretService typePretService, ExemplaireService exemplaireService, PretService pretService) {
         this.livreService = livreService;
         this.typePretService = typePretService;
         this.exemplaireService = exemplaireService;
+        this.pretService = pretService;
     }
 
     /**
@@ -150,5 +155,66 @@ public class ClientController {
         model.addAttribute("contentPage", "client-profile");
         model.addAttribute("pageTitle", "Mon Profil");
         return "layout";
+    }
+
+    /**
+     * Show client's borrowed books for return
+     */
+    @GetMapping("/mes-emprunts")
+    public String showMyLoans(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        // Check client access
+        if (!LoginController.checkClientAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+
+        User currentUser = (User) session.getAttribute("currentUser");
+        Adherent sessionAdherent = (Adherent) session.getAttribute("currentAdherent");
+        
+        // Get adherent's active loans (validated and not returned)
+        List<Pret> activeLoans = pretService.getActiveLoansForAdherent(sessionAdherent);
+        
+        model.addAttribute("activeLoans", activeLoans);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("currentDate", new java.util.Date());
+        model.addAttribute("contentPage", "client-emprunts");
+        model.addAttribute("pageTitle", "Mes Emprunts");
+        return "layout";
+    }
+
+    /**
+     * Handle book return with custom date (for simulation)
+     */
+    @PostMapping("/retour")
+    public String returnBook(@RequestParam Long pretId,
+                           @RequestParam String dateRetour,
+                           HttpSession session,
+                           RedirectAttributes redirectAttributes) {
+        // Check client access
+        if (!LoginController.checkClientAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+
+        try {
+            Adherent sessionAdherent = (Adherent) session.getAttribute("currentAdherent");
+            
+            // Parse the return date
+            java.time.LocalDate returnDate = java.time.LocalDate.parse(dateRetour);
+            java.time.LocalDateTime returnDateTime = returnDate.atStartOfDay();
+            
+            // Process the return with penalty check
+            PretService.BookReturnResult result = pretService.returnBookWithDate(pretId, returnDateTime, sessionAdherent);
+            
+            if (result.isSuccessful()) {
+                redirectAttributes.addFlashAttribute("successMessage", result.getMessage());
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", result.getMessage());
+            }
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Erreur lors du retour: " + e.getMessage());
+        }
+        
+        return "redirect:/client/mes-emprunts";
     }
 }

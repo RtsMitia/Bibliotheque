@@ -112,4 +112,28 @@ public class PenaliteService {
     public Optional<Penalite> findById(Long id) {
         return penaliteRepository.findById(id);
     }
+    
+    /**
+     * Apply penalty for late book return
+     */
+    public String applyLatePenalty(Adherent adherent, int daysLate) {
+        // Get penalty configuration for adherent type
+        Optional<PenaliteConfig> configOpt = penaliteConfigRepository.findByTypeAdherent(adherent.getTypeAdherent());
+        if (configOpt.isEmpty()) {
+            return "Configuration de pénalité non trouvée - aucune pénalité appliquée.";
+        }
+        
+        PenaliteConfig config = configOpt.get();
+        int penaltyDays = config.getNombreJour();
+        
+        // Calculate penalty period
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(penaltyDays);
+        
+        // Create penalty
+        Penalite penalty = createPenalty(adherent, startDate, endDate);
+        
+        return String.format("Pénalité appliquée: %d jour(s) d'interdiction d'emprunt (jusqu'au %s)", 
+            penaltyDays, endDate.toString());
+    }
 }
