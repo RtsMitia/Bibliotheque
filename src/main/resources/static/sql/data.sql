@@ -1,4 +1,4 @@
 ---Type Adherent
-INSERT INTO type_adherent (id, libelle) VALUES 
-(1, 'etudiant'),
-(2, 'professionel');
+INSERT INTO type_adherent (libelle) VALUES 
+('etudiant'),
+('professionel');

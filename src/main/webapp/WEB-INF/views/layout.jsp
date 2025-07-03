@@ -159,6 +159,7 @@
     <nav class="sidebar-nav">
         <a href="${pageContext.request.contextPath}/">Home</a>
         <a href="${pageContext.request.contextPath}/adherents/new">Add Adherent</a>
+        <a href="${pageContext.request.contextPath}/adherents/inscription-a-valider">Inscription à Valider</a>
     </nav>
 </div>
 

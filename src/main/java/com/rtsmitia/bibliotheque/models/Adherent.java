@@ -2,7 +2,7 @@ package com.rtsmitia.bibliotheque.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Table(name = "adherents")
@@ -36,6 +36,9 @@ public class Adherent {
 
     @Column(name = "date_inscription")
     private LocalDateTime dateInscription;
+
+    @OneToMany(mappedBy = "adherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<HistoriqueStatutAbonnement> historiqueStatuts;
 
     // === Constructor to auto-set date_inscription ===
     @PrePersist
@@ -117,5 +120,25 @@ public class Adherent {
 
     public void setDateInscription(LocalDateTime dateInscription) {
         this.dateInscription = dateInscription;
+    }
+
+    public List<HistoriqueStatutAbonnement> getHistoriqueStatuts() {
+        return historiqueStatuts;
+    }
+
+    public void setHistoriqueStatuts(List<HistoriqueStatutAbonnement> historiqueStatuts) {
+        this.historiqueStatuts = historiqueStatuts;
+    }
+    
+    public String getFormattedDateInscription() {
+        if (this.dateInscription == null) {
+            return "";
+        }
+        return String.format("%02d/%02d/%d %02d:%02d", 
+                this.dateInscription.getDayOfMonth(),
+                this.dateInscription.getMonthValue(),
+                this.dateInscription.getYear(),
+                this.dateInscription.getHour(),
+                this.dateInscription.getMinute());
     }
 }

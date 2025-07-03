@@ -1,11 +1,16 @@
 package com.rtsmitia.bibliotheque.controllers;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.rtsmitia.bibliotheque.models.Adherent;
 import com.rtsmitia.bibliotheque.services.AdherentService;
@@ -45,10 +50,39 @@ public class AdherentController {
             model.addAttribute("adherent", adherent); // preserve form values
         }
         model.addAttribute("typesAdherents", typeAdherentService.getAllTypes());
-        // Always set the content fragment
         model.addAttribute("contentPage", "adherent-form");
 
         return "layout";
     }
 
+    @GetMapping("/inscription-a-valider")
+    public String showInscriptionAValider(Model model) {
+        List<Adherent> adherentsAValider = adherentService.getAdherentsWithStatusDemande();
+        model.addAttribute("adherentsAValider", adherentsAValider);
+        model.addAttribute("contentPage", "inscription-a-valider");
+        return "layout";
+    }
+
+    @GetMapping("/status/demande")
+    @ResponseBody
+    public List<Adherent> getAdherentsWithStatusDemande() {
+        return adherentService.getAdherentsWithStatusDemande();
+    }
+
+    @GetMapping("/all")
+    @ResponseBody
+    public List<Adherent> getAllAdherents() {
+        return adherentService.getAllAdherents();
+    }
+    
+    @GetMapping("/approve-adherent/{id}")
+    public String approveAdherant(@PathVariable Long id, Model model) {
+        try {
+            adherentService.approveAdherent(id);
+        } catch (IllegalArgumentException e) {
+            
+        }
+        return "redirect:/adherents/inscription-a-valider";
+    }
+    
 }
