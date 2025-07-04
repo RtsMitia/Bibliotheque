@@ -98,4 +98,15 @@ public class Prolongement {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    // Helper methods for JSP date display
+    public java.util.Date getDateProlongementAsDate() {
+        return dateProlongement != null ? 
+               java.sql.Timestamp.valueOf(dateProlongement) : null;
+    }
+
+    public java.util.Date getNouvelleDateRetourAsDate() {
+        return nouvelleDateRetour != null ? 
+               java.sql.Timestamp.valueOf(nouvelleDateRetour) : null;
+    }
 }

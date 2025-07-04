@@ -23,10 +23,10 @@ public class StatutProlongement {
 
     // Enum for status types
     public enum StatutType {
-        DEMANDE("demandé"),
-        APPROUVE("approuvé"),
-        REFUSE("refusé"),
-        ANNULE("annulé");
+        DEMANDE("demande"),
+        EN_ATTENTE("en attente"),
+        VALIDE("valide"),
+        REFUSE("refuse");
 
         private final String libelle;
 

@@ -28,6 +28,9 @@ public class PretController {
     @Autowired
     private AdherentService adherentService;
     
+    @Autowired
+    private ProlongementService prolongementService;
+    
     /**
      * Client requests to borrow a book
      */
@@ -285,5 +288,81 @@ public class PretController {
         }
         
         return "layout";
+    }
+
+    /**
+     * View pending prolongement requests (admin)
+     */
+    @GetMapping("/prolongements")
+    public String viewProlongementRequests(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        
+        // Check admin access
+        if (!LoginController.checkAdminAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+        
+        try {
+            List<Prolongement> pendingRequests = prolongementService.getPendingProlongementRequests();
+            
+            model.addAttribute("pendingRequests", pendingRequests);
+            model.addAttribute("contentPage", "prolongement-requests");
+            model.addAttribute("pageTitle", "Demandes de Prolongement");
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Erreur lors du chargement des demandes: " + e.getMessage());
+        }
+        
+        return "layout";
+    }
+
+    /**
+     * Approve a prolongement request (admin)
+     */
+    @PostMapping("/prolongements/{id}/approve")
+    public String approveProlongement(@PathVariable Long id, 
+                                    HttpSession session, 
+                                    RedirectAttributes redirectAttributes) {
+        
+        // Check admin access
+        if (!LoginController.checkAdminAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+        
+        try {
+            prolongementService.approveProlongement(id, java.time.LocalDateTime.now());
+            redirectAttributes.addFlashAttribute("successMessage", 
+                "Demande de prolongement approuvée avec succès");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Erreur lors de l'approbation: " + e.getMessage());
+        }
+        
+        return "redirect:/prets/prolongements";
+    }
+
+    /**
+     * Reject a prolongement request (admin)
+     */
+    @PostMapping("/prolongements/{id}/reject")
+    public String rejectProlongement(@PathVariable Long id, 
+                                   HttpSession session, 
+                                   RedirectAttributes redirectAttributes) {
+        
+        // Check admin access
+        if (!LoginController.checkAdminAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+        
+        try {
+            prolongementService.rejectProlongement(id, java.time.LocalDateTime.now());
+            redirectAttributes.addFlashAttribute("successMessage", 
+                "Demande de prolongement rejetée");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Erreur lors du rejet: " + e.getMessage());
+        }
+        
+        return "redirect:/prets/prolongements";
     }
 }

@@ -3,6 +3,7 @@ package com.rtsmitia.bibliotheque.services;
 import com.rtsmitia.bibliotheque.models.Prolongement;
 import com.rtsmitia.bibliotheque.models.Pret;
 import com.rtsmitia.bibliotheque.models.StatutProlongement;
+import com.rtsmitia.bibliotheque.models.Adherent;
 import com.rtsmitia.bibliotheque.repositories.ProlongementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,15 +17,61 @@ public class ProlongementService {
 
     private final ProlongementRepository prolongementRepository;
     private final StatutProlongementService statutProlongementService;
+    private final QuotaPretService quotaPretService;
+    private final PenaliteService penaliteService;
+    private final PretService pretService;
 
     @Autowired
-    public ProlongementService(ProlongementRepository prolongementRepository, StatutProlongementService statutProlongementService) {
+    public ProlongementService(ProlongementRepository prolongementRepository, 
+                               StatutProlongementService statutProlongementService,
+                               QuotaPretService quotaPretService,
+                               PenaliteService penaliteService,
+                               PretService pretService) {
         this.prolongementRepository = prolongementRepository;
         this.statutProlongementService = statutProlongementService;
+        this.quotaPretService = quotaPretService;
+        this.penaliteService = penaliteService;
+        this.pretService = pretService;
     }
 
     /**
-     * Create a new prolongement request
+     * Create a new prolongement request with validation
+     */
+    public Prolongement createProlongement(Pret pret, LocalDateTime dateProlongement) {
+        // Validate that the request is made before the due date
+        if (dateProlongement.isAfter(pret.getDateFin())) {
+            throw new RuntimeException("La demande de prolongement ne peut pas être faite après la date d'échéance du prêt");
+        }
+        
+        // Check if adherent has any active penalties
+        if (hasActivePenalities(pret.getAdherent())) {
+            throw new RuntimeException("Impossible de prolonger : l'adhérent a des pénalités actives");
+        }
+        
+        // Check if there's already a pending request
+        if (hasPendingExtensionRequest(pret)) {
+            throw new RuntimeException("Une demande de prolongement est déjà en cours pour ce prêt");
+        }
+        
+        // Automatically determine the prolongement duration based on adherent's quota
+        Integer prolongementDays = quotaPretService.getLoanDurationForType(pret.getAdherent().getTypeAdherent());
+        LocalDateTime nouvelleDateRetour = pret.getDateFin().plusDays(prolongementDays);
+        
+        Prolongement prolongement = new Prolongement(dateProlongement, nouvelleDateRetour, pret);
+        Prolongement savedProlongement = prolongementRepository.save(prolongement);
+        
+        // Create initial status
+        statutProlongementService.createStatutProlongement(
+            savedProlongement, 
+            StatutProlongement.StatutType.DEMANDE, 
+            dateProlongement
+        );
+        
+        return savedProlongement;
+    }
+
+    /**
+     * Create a new prolongement request with custom duration (for admin use)
      */
     public Prolongement createProlongement(Pret pret, LocalDateTime dateProlongement, LocalDateTime nouvelleDateRetour) {
         Prolongement prolongement = new Prolongement(dateProlongement, nouvelleDateRetour, pret);
@@ -127,12 +174,27 @@ public class ProlongementService {
         if (optionalProlongement.isPresent()) {
             Prolongement prolongement = optionalProlongement.get();
             
+            // Validate that the request was made before the due date
+            if (prolongement.getDateProlongement().isAfter(prolongement.getPret().getDateFin())) {
+                throw new RuntimeException("Impossible d'approuver : la demande a été faite après la date d'échéance");
+            }
+            
+            // Check if adherent still has no active penalties
+            if (hasActivePenalities(prolongement.getPret().getAdherent())) {
+                throw new RuntimeException("Impossible d'approuver : l'adhérent a des pénalités actives");
+            }
+            
             // Create approval status
             statutProlongementService.createStatutProlongement(
                 prolongement,
-                StatutProlongement.StatutType.APPROUVE,
+                StatutProlongement.StatutType.VALIDE,
                 dateApprobation
             );
+            
+            // Update the loan's end date
+            Pret pret = prolongement.getPret();
+            pret.setDateFin(prolongement.getNouvelleDateRetour());
+            pretService.save(pret);
             
             return prolongement;
         }
@@ -157,5 +219,41 @@ public class ProlongementService {
             return prolongement;
         }
         throw new RuntimeException("Prolongement not found with id: " + prolongementId);
+    }
+
+    /**
+     * Check if a loan has a pending extension request
+     */
+    public boolean hasPendingExtensionRequest(Pret pret) {
+        List<Prolongement> prolongements = getProlongementsByPret(pret);
+        for (Prolongement prolongement : prolongements) {
+            StatutProlongement currentStatus = statutProlongementService.getCurrentStatus(prolongement);
+            if (currentStatus != null && 
+                ("demande".equals(currentStatus.getStatut()) || "en attente".equals(currentStatus.getStatut()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Check if an adherent has active penalties
+     */
+    private boolean hasActivePenalities(Adherent adherent) {
+        return penaliteService.hasActivePenalties(adherent);
+    }
+
+    /**
+     * Get all pending prolongement requests for admin approval
+     */
+    public List<Prolongement> getPendingProlongementRequests() {
+        List<Prolongement> allProlongements = getAllProlongements();
+        return allProlongements.stream()
+            .filter(prolongement -> {
+                StatutProlongement currentStatus = statutProlongementService.getCurrentStatus(prolongement);
+                return currentStatus != null && 
+                       ("demande".equals(currentStatus.getStatut()) || "en attente".equals(currentStatus.getStatut()));
+            })
+            .toList();
     }
 }

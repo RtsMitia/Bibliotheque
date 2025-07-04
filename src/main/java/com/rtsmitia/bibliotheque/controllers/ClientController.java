@@ -9,6 +9,8 @@ import com.rtsmitia.bibliotheque.services.LivreService;
 import com.rtsmitia.bibliotheque.services.TypePretService;
 import com.rtsmitia.bibliotheque.services.ExemplaireService;
 import com.rtsmitia.bibliotheque.services.PretService;
+import com.rtsmitia.bibliotheque.services.ProlongementService;
+import com.rtsmitia.bibliotheque.services.QuotaPretService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/client")
@@ -26,13 +31,17 @@ public class ClientController {
     private final TypePretService typePretService;
     private final ExemplaireService exemplaireService;
     private final PretService pretService;
+    private final ProlongementService prolongementService;
+    private final QuotaPretService quotaPretService;
 
     @Autowired
-    public ClientController(LivreService livreService, TypePretService typePretService, ExemplaireService exemplaireService, PretService pretService) {
+    public ClientController(LivreService livreService, TypePretService typePretService, ExemplaireService exemplaireService, PretService pretService, ProlongementService prolongementService, QuotaPretService quotaPretService) {
         this.livreService = livreService;
         this.typePretService = typePretService;
         this.exemplaireService = exemplaireService;
         this.pretService = pretService;
+        this.prolongementService = prolongementService;
+        this.quotaPretService = quotaPretService;
     }
 
     /**
@@ -173,7 +182,15 @@ public class ClientController {
         // Get adherent's active loans (validated and not returned)
         List<Pret> activeLoans = pretService.getActiveLoansForAdherent(sessionAdherent);
         
+        // Check for pending extension requests for each loan
+        Map<Long, Boolean> pendingExtensions = new HashMap<>();
+        for (Pret pret : activeLoans) {
+            boolean hasPending = prolongementService.hasPendingExtensionRequest(pret);
+            pendingExtensions.put(pret.getId(), hasPending);
+        }
+        
         model.addAttribute("activeLoans", activeLoans);
+        model.addAttribute("pendingExtensions", pendingExtensions);
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("currentDate", new java.util.Date());
         model.addAttribute("contentPage", "client-emprunts");
@@ -213,6 +230,69 @@ public class ClientController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", 
                 "Erreur lors du retour: " + e.getMessage());
+        }
+        
+        return "redirect:/client/mes-emprunts";
+    }
+
+    /**
+     * Request loan extension for a specific loan
+     */
+    @PostMapping("/prolongement")
+    public String requestExtension(@RequestParam Long pretId,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        // Check client access
+        if (!LoginController.checkClientAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+
+        try {
+            Adherent sessionAdherent = (Adherent) session.getAttribute("currentAdherent");
+            
+            // Get the loan
+            Optional<Pret> pretOpt = pretService.findById(pretId);
+            if (pretOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Prêt introuvable.");
+                return "redirect:/client/mes-emprunts";
+            }
+            
+            Pret pret = pretOpt.get();
+            
+            // Check if the loan belongs to the adherent
+            if (!pret.getAdherent().getId().equals(sessionAdherent.getId())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Ce prêt ne vous appartient pas.");
+                return "redirect:/client/mes-emprunts";
+            }
+            
+            // Check if loan is active and not returned
+            if (pret.getDateRetour() != null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Ce livre a déjà été retourné.");
+                return "redirect:/client/mes-emprunts";
+            }
+            
+            // Check if there's already a pending extension request
+            boolean hasPendingExtension = prolongementService.hasPendingExtensionRequest(pret);
+            if (hasPendingExtension) {
+                redirectAttributes.addFlashAttribute("errorMessage", 
+                    "Une demande de prolongement est déjà en cours pour ce prêt.");
+                return "redirect:/client/mes-emprunts";
+            }
+            
+            // Create extension request with automatic duration based on adherent type
+            java.time.LocalDateTime requestDate = java.time.LocalDateTime.now();
+            
+            prolongementService.createProlongement(pret, requestDate);
+            
+            // Get the extension duration for display
+            Integer extensionDays = quotaPretService.getLoanDurationForType(sessionAdherent.getTypeAdherent());
+            
+            redirectAttributes.addFlashAttribute("successMessage", 
+                String.format("Demande de prolongement de %d jour(s) envoyée avec succès! Elle sera examinée par un administrateur.", extensionDays));
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Erreur lors de la demande de prolongement: " + e.getMessage());
         }
         
         return "redirect:/client/mes-emprunts";
