@@ -114,10 +114,10 @@ public class StatutProlongementService {
     }
 
     /**
-     * Get approved prolongements (statut = "approuvé")
+     * Get approved prolongements (statut = "valide")
      */
     public List<StatutProlongement> getApprovedRequests() {
-        return getStatutsByType(StatutProlongement.StatutType.APPROUVE);
+        return getStatutsByType(StatutProlongement.StatutType.VALIDE);
     }
 
     /**
@@ -160,7 +160,7 @@ public class StatutProlongementService {
      * Check if a prolongement is approved
      */
     public boolean isApproved(Prolongement prolongement) {
-        return hasStatus(prolongement, StatutProlongement.StatutType.APPROUVE);
+        return hasStatus(prolongement, StatutProlongement.StatutType.VALIDE);
     }
 
     /**
@@ -168,5 +168,24 @@ public class StatutProlongementService {
      */
     public boolean isRejected(Prolongement prolongement) {
         return hasStatus(prolongement, StatutProlongement.StatutType.REFUSE);
+    }
+
+    /**
+     * Get the current (most recent) status for a prolongement
+     */
+    public StatutProlongement getCurrentStatus(Prolongement prolongement) {
+        List<StatutProlongement> statuts = getStatutsByProlongement(prolongement);
+        if (statuts.isEmpty()) {
+            return null;
+        }
+
+        // Find the most recent status
+        StatutProlongement currentStatus = statuts.get(0);
+        for (StatutProlongement statut : statuts) {
+            if (statut.getDateChangement().isAfter(currentStatus.getDateChangement())) {
+                currentStatus = statut;
+            }
+        }
+        return currentStatus;
     }
 }

@@ -70,9 +70,9 @@ INSERT INTO type_pret (libelle) VALUES
 ('lire sur place');
 
 ---Quota Prêt
-INSERT INTO quota_pret (nombre_livre, nombre_jour_pret, date_changement, id_type_adherant) VALUES 
-(5, 10, CURRENT_DATE, 1), -- etudiant: 5 livres, 10 jours
-(7, 5, CURRENT_DATE, 2);  -- professionel: 7 livres, 5 jours
+INSERT INTO quota_pret (nombre_livre, nombre_jour_pret, date_changement, id_type_adherent) VALUES 
+(5, 10, CURRENT_DATE, 1), -- etudiant: 5 livres, 14 jours
+(7, 5, CURRENT_DATE, 2);  -- professionel: 7 livres, 21 jours
 
 ---Pénalité Configuration
 INSERT INTO penalite_config (id, nombre_jour, date_changement, id_type_adherent) VALUES 

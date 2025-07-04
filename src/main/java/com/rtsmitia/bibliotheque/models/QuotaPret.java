@@ -21,7 +21,7 @@ public class QuotaPret {
     private LocalDateTime dateChangement;
 
     @ManyToOne
-    @JoinColumn(name = "id_type_adherant", nullable = false)
+    @JoinColumn(name = "id_type_adherent", nullable = false)
     private TypeAdherent typeAdherent;
 
     // Default constructor

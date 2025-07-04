@@ -51,6 +51,18 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(220,53,69,0.3);
     }
+    .extension-btn {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        color: white;
+    }
+    .extension-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(23,162,184,0.3);
+        color: white;
+    }
 </style>
 
 <!-- Page Header -->
@@ -118,23 +130,30 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h5 class="card-title mb-0">${pret.exemplaire.livre.titre}</h5>
-                                    <c:choose>
-                                        <c:when test="${daysDiff < 0}">
-                                            <span class="badge bg-danger status-badge">
-                                                En retard (${Math.abs(daysDiff)} jour(s))
+                                    <div class="d-flex flex-column align-items-end">
+                                        <c:choose>
+                                            <c:when test="${daysDiff < 0}">
+                                                <span class="badge bg-danger status-badge">
+                                                    En retard (${Math.abs(daysDiff)} jour(s))
+                                                </span>
+                                            </c:when>
+                                            <c:when test="${daysDiff >= 0 && daysDiff <= 2}">
+                                                <span class="badge bg-warning status-badge">
+                                                    À rendre dans ${daysDiff} jour(s)
+                                                </span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge bg-success status-badge">
+                                                    ${daysDiff} jour(s) restant(s)
+                                                </span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <c:if test="${pendingExtensions[pret.id]}">
+                                            <span class="badge bg-info status-badge mt-1">
+                                                <i class="fas fa-hourglass-half"></i> Prolongement demandé
                                             </span>
-                                        </c:when>
-                                        <c:when test="${daysDiff >= 0 && daysDiff <= 2}">
-                                            <span class="badge bg-warning status-badge">
-                                                À rendre dans ${daysDiff} jour(s)
-                                            </span>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="badge bg-success status-badge">
-                                                ${daysDiff} jour(s) restant(s)
-                                            </span>
-                                        </c:otherwise>
-                                    </c:choose>
+                                        </c:if>
+                                    </div>
                                 </div>
                                 
                                 <p class="card-text">
@@ -171,13 +190,96 @@
                             </div>
                             
                             <div class="card-footer bg-transparent">
-                                <button type="button" class="btn btn-danger return-btn w-100" 
-                                        data-bs-toggle="modal" data-bs-target="#returnModal${pret.id}">
-                                    <i class="fas fa-undo"></i> Rendre ce livre
-                                </button>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <c:choose>
+                                            <c:when test="${pendingExtensions[pret.id]}">
+                                                <button type="button" class="btn btn-secondary w-100" disabled 
+                                                        title="Une demande de prolongement est déjà en cours">
+                                                    <i class="fas fa-hourglass-half"></i> En attente
+                                                </button>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <button type="button" class="btn extension-btn w-100" 
+                                                        data-bs-toggle="modal" data-bs-target="#extensionModal${pret.id}">
+                                                    <i class="fas fa-clock"></i> Prolonger
+                                                </button>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-danger return-btn w-100" 
+                                                data-bs-toggle="modal" data-bs-target="#returnModal${pret.id}">
+                                            <i class="fas fa-undo"></i> Rendre
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Extension Request Modal (only if no pending request) -->
+                    <c:if test="${not pendingExtensions[pret.id]}">
+                    <div class="modal fade" id="extensionModal${pret.id}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Demande de prolongement</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="/client/prolongement" method="post">
+                                    <div class="modal-body">
+                                        <div class="text-center mb-4">
+                                            <i class="fas fa-clock fa-3x text-info mb-3"></i>
+                                            <h5>Prolonger la durée d'emprunt ?</h5>
+                                            <p>Livre: "<strong>${pret.exemplaire.livre.titre}</strong>"</p>
+                                            <p>Exemplaire: <strong>#${pret.exemplaire.id}</strong></p>
+                                        </div>
+                                        
+                                        <input type="hidden" name="pretId" value="${pret.id}">
+                                        
+                                        <!-- Current loan info -->
+                                        <div class="alert alert-info">
+                                            <h6><i class="fas fa-info-circle"></i> Informations actuelles:</h6>
+                                            <small>
+                                                Date d'emprunt: <fmt:formatDate value="${pret.dateDebutAsDate}" pattern="dd/MM/yyyy"/><br>
+                                                Date de retour prévue: <fmt:formatDate value="${pret.dateFinAsDate}" pattern="dd/MM/yyyy"/>
+                                                <c:if test="${daysDiff < 0}">
+                                                    <br><span class="text-danger">En retard de ${Math.abs(daysDiff)} jour(s)</span>
+                                                </c:if>
+                                                <c:if test="${daysDiff >= 0}">
+                                                    <br><span class="text-success">${daysDiff} jour(s) restant(s)</span>
+                                                </c:if>
+                                            </small>
+                                        </div>
+                                        
+                                        <div class="alert alert-success">
+                                            <h6><i class="fas fa-calendar-plus"></i> Prolongement automatique:</h6>
+                                            <small>
+                                                La durée de prolongement sera déterminée automatiquement selon votre type d'adhérent.
+                                            </small>
+                                        </div>
+                                        
+                                        <div class="alert alert-warning">
+                                            <small>
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                Cette demande sera examinée par un administrateur. Vous recevrez une réponse dans les plus brefs délais.
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            <i class="fas fa-times"></i> Annuler
+                                        </button>
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fas fa-paper-plane"></i> Envoyer la demande
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    </c:if>
 
                     <!-- Return Book Modal -->
                     <div class="modal fade" id="returnModal${pret.id}" tabindex="-1">
