@@ -78,3 +78,17 @@ INSERT INTO quota_pret (nombre_livre, nombre_jour_pret, date_changement, id_type
 INSERT INTO penalite_config (id, nombre_jour, date_changement, id_type_adherent) VALUES 
 (1, 7, CURRENT_DATE, 1),  -- etudiant: 7 jours de pénalité
 (2, 3, CURRENT_DATE, 2);  -- professionel: 3 jours de pénalité
+
+---Jours Fériés (Sample holidays for testing)
+INSERT INTO jour_ferie (date_debut, date_fin, date_creation) VALUES 
+-- Christmas period (Dec 24-26, 2025)
+('2025-12-24', '2025-12-26', CURRENT_DATE),
+-- New Year period (Dec 31, 2025 - Jan 2, 2026)
+('2025-12-31', '2026-01-02', CURRENT_DATE),
+-- Easter period (April 20-21, 2026) 
+('2026-04-20', '2026-04-21', CURRENT_DATE),
+-- Single day holidays
+('2025-07-14', NULL, CURRENT_DATE), -- Bastille Day
+('2025-11-11', NULL, CURRENT_DATE), -- Armistice Day
+('2025-05-01', NULL, CURRENT_DATE), -- Labor Day
+('2025-05-08', NULL, CURRENT_DATE); -- Victory Day
