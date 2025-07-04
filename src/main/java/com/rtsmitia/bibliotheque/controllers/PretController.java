@@ -37,6 +37,7 @@ public class PretController {
     @PostMapping("/request")
     public String requestLoan(@RequestParam Long exemplaireId,
                              @RequestParam Long typePretId,
+                             @RequestParam String dateEmprunt,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         
@@ -73,11 +74,18 @@ public class PretController {
                 return "redirect:/client/livres";
             }
             
-            // Create loan request
-            pretService.requestLoan(adherent, exemplaireOpt.get(), typePretOpt.get());
+            // Create loan request with specified date
+            java.time.LocalDate loanDate = java.time.LocalDate.parse(dateEmprunt);
+            java.time.LocalDateTime loanDateTime = loanDate.atStartOfDay();
+            
+            pretService.requestLoan(adherent, exemplaireOpt.get(), typePretOpt.get(), loanDateTime);
             
             redirectAttributes.addFlashAttribute("successMessage", 
                 "Demande de prêt envoyée avec succès! Elle sera examinée par un administrateur.");
+            
+        } catch (java.time.format.DateTimeParseException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Format de date invalide.");
+            return "redirect:/client/livres";
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", 

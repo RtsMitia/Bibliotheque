@@ -54,6 +54,28 @@ public class PretService {
     }
     
     /**
+     * Client requests to borrow a book with specific start date - for simulation/testing
+     */
+    @Transactional
+    public Pret requestLoan(Adherent adherent, Exemplaire exemplaire, TypePret typePret, LocalDateTime dateDebut) {
+        // Create loan with specific start date for simulation
+        Pret pret = new Pret();
+        pret.setAdherent(adherent);
+        pret.setExemplaire(exemplaire);
+        pret.setTypePret(typePret);
+        pret.setDateDebut(dateDebut);
+        // dateFin and dateRetour remain null until approved
+        
+        // Save the loan request
+        Pret savedPret = pretRepository.save(pret);
+        
+        // Create initial status as "demande"
+        statutPretService.createStatus(savedPret, StatutPretEnum.demande);
+        
+        return savedPret;
+    }
+    
+    /**
      * Admin puts loan request on hold
      */
     @Transactional
@@ -88,8 +110,8 @@ public class PretService {
             return new LoanApprovalResult(false, eligibility.getReason());
         }
         
-        // Set loan dates
-        LocalDateTime dateDebut = LocalDateTime.now();
+        // Set loan dates - use existing dateDebut if set by client, otherwise use current date
+        LocalDateTime dateDebut = (pret.getDateDebut() != null) ? pret.getDateDebut() : LocalDateTime.now();
         int loanDays = quotaService.getMaxLoanDays(adherent);
         LocalDateTime dateFin = dateDebut.plusDays(loanDays);
         

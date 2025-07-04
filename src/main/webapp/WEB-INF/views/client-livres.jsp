@@ -80,7 +80,12 @@
                     </div>
                 </div>
                 <h1><i class="fas fa-book"></i> Catalogue des Livres</h1>
-                <p class="mb-0">Découvrez et empruntez nos livres</p>
+                <p class="mb-0">
+                    Découvrez et empruntez nos livres
+                    <small class="ms-3">
+                        <i class="fas fa-flask"></i> Mode test activé - dates flexibles pour simulation
+                    </small>
+                </p>
             </div>
             <div class="col-auto">
                 <a href="/client/mes-emprunts" class="btn btn-outline-light me-2">
@@ -277,6 +282,19 @@
                                             Votre durée d'emprunt dépend de votre type d'adhérent
                                         </small>
                                     </div>
+
+                                    <!-- Date d'emprunt Selection -->
+                                    <div class="mb-3">
+                                        <label for="dateEmprunt${livre.id}" class="form-label">
+                                            <i class="fas fa-calendar-plus"></i> Date d'emprunt:
+                                        </label>
+                                        <input type="date" class="form-control" id="dateEmprunt${livre.id}" 
+                                               name="dateEmprunt" required
+                                               value="<fmt:formatDate value='${currentDate}' pattern='yyyy-MM-dd'/>">
+                                        <small class="form-text text-muted">
+                                            <i class="fas fa-flask"></i> <strong>Mode test:</strong> Vous pouvez choisir n'importe quelle date pour simuler différents scénarios (emprunts passés, futurs, etc.)
+                                        </small>
+                                    </div>
                                     
                                     <!-- Show constraints if any -->
                                     <c:if test="${not empty livre.contraintes}">
@@ -292,6 +310,8 @@
                                         <small>
                                             <i class="fas fa-info-circle"></i>
                                             Votre demande sera soumise pour validation par un administrateur.
+                                            <br>
+                                            <strong>Mode test:</strong> Vous pouvez choisir n'importe quelle date pour tester différents scénarios. La date de fin sera calculée automatiquement selon votre type d'adhérent une fois approuvée.
                                         </small>
                                     </div>
                                 </div>
@@ -384,6 +404,28 @@
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
+            }
+        });
+    });
+
+    // Add date validation and feedback for testing scenarios
+    document.querySelectorAll('input[type="date"]').forEach(dateInput => {
+        dateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            const diffTime = selectedDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Find the closest info alert to update
+            const modal = this.closest('.modal');
+            const infoAlert = modal.querySelector('.alert-info small');
+            
+            if (diffDays === 0) {
+                infoAlert.innerHTML = '<i class="fas fa-info-circle"></i> <strong>Test:</strong> Emprunt commençant aujourd\'hui.<br><strong>Note:</strong> La date de fin sera calculée automatiquement selon votre type d\'adhérent une fois approuvée.';
+            } else if (diffDays > 0) {
+                infoAlert.innerHTML = '<i class="fas fa-info-circle"></i> <strong>Test:</strong> Emprunt futur commençant dans ' + diffDays + ' jour(s).<br><strong>Note:</strong> La date de fin sera calculée automatiquement selon votre type d\'adhérent une fois approuvée.';
+            } else {
+                infoAlert.innerHTML = '<i class="fas fa-flask text-warning"></i> <strong>Mode test:</strong> Emprunt dans le passé (il y a ' + Math.abs(diffDays) + ' jour(s)).<br><strong>Utile pour:</strong> Tester les retards, pénalités, et restrictions d\'emprunt. La date de fin sera calculée automatiquement.';
             }
         });
     });
