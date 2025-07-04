@@ -20,18 +20,21 @@ public class ProlongementService {
     private final QuotaPretService quotaPretService;
     private final PenaliteService penaliteService;
     private final PretService pretService;
+    private final JourFerieService jourFerieService;
 
     @Autowired
     public ProlongementService(ProlongementRepository prolongementRepository, 
                                StatutProlongementService statutProlongementService,
                                QuotaPretService quotaPretService,
                                PenaliteService penaliteService,
-                               PretService pretService) {
+                               PretService pretService,
+                               JourFerieService jourFerieService) {
         this.prolongementRepository = prolongementRepository;
         this.statutProlongementService = statutProlongementService;
         this.quotaPretService = quotaPretService;
         this.penaliteService = penaliteService;
         this.pretService = pretService;
+        this.jourFerieService = jourFerieService;
     }
 
     /**
@@ -55,7 +58,11 @@ public class ProlongementService {
         
         // Automatically determine the prolongement duration based on adherent's quota
         Integer prolongementDays = quotaPretService.getLoanDurationForType(pret.getAdherent().getTypeAdherent());
-        LocalDateTime nouvelleDateRetour = pret.getDateFin().plusDays(prolongementDays);
+        LocalDateTime calculatedNouvelleDateRetour = pret.getDateFin().plusDays(prolongementDays);
+        
+        // Adjust the nouvelle date retour to avoid holidays
+        java.time.LocalDate adjustedEndDate = jourFerieService.adjustLoanEndDate(calculatedNouvelleDateRetour.toLocalDate());
+        LocalDateTime nouvelleDateRetour = adjustedEndDate.atTime(calculatedNouvelleDateRetour.toLocalTime());
         
         Prolongement prolongement = new Prolongement(dateProlongement, nouvelleDateRetour, pret);
         Prolongement savedProlongement = prolongementRepository.save(prolongement);
@@ -191,9 +198,11 @@ public class ProlongementService {
                 dateApprobation
             );
             
-            // Update the loan's end date
+            // Update the loan's end date, adjusting for holidays
             Pret pret = prolongement.getPret();
-            pret.setDateFin(prolongement.getNouvelleDateRetour());
+            java.time.LocalDate adjustedEndDate = jourFerieService.adjustLoanEndDate(prolongement.getNouvelleDateRetour().toLocalDate());
+            LocalDateTime finalDateFin = adjustedEndDate.atTime(prolongement.getNouvelleDateRetour().toLocalTime());
+            pret.setDateFin(finalDateFin);
             pretService.save(pret);
             
             return prolongement;

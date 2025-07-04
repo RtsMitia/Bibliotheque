@@ -30,6 +30,9 @@ public class PretService {
     private QuotaService quotaService;
     
     @Autowired
+    private JourFerieService jourFerieService;
+    
+    @Autowired
     private ExemplaireService exemplaireService;
     
     /**
@@ -113,7 +116,11 @@ public class PretService {
         // Set loan dates - use existing dateDebut if set by client, otherwise use current date
         LocalDateTime dateDebut = (pret.getDateDebut() != null) ? pret.getDateDebut() : LocalDateTime.now();
         int loanDays = quotaService.getMaxLoanDays(adherent);
-        LocalDateTime dateFin = dateDebut.plusDays(loanDays);
+        LocalDateTime calculatedDateFin = dateDebut.plusDays(loanDays);
+        
+        // Adjust end date to avoid holidays
+        java.time.LocalDate adjustedEndDate = jourFerieService.adjustLoanEndDate(calculatedDateFin.toLocalDate());
+        LocalDateTime dateFin = adjustedEndDate.atTime(calculatedDateFin.toLocalTime());
         
         pret.setDateDebut(dateDebut);
         pret.setDateFin(dateFin);
