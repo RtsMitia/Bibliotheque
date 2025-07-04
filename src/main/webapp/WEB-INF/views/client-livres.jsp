@@ -291,9 +291,7 @@
                                         <input type="date" class="form-control" id="dateEmprunt${livre.id}" 
                                                name="dateEmprunt" required
                                                value="<fmt:formatDate value='${currentDate}' pattern='yyyy-MM-dd'/>">
-                                        <small class="form-text text-muted">
-                                            <i class="fas fa-flask"></i> <strong>Mode test:</strong> Vous pouvez choisir n'importe quelle date pour simuler différents scénarios (emprunts passés, futurs, etc.)
-                                        </small>
+                                        
                                     </div>
                                     
                                     <!-- Show constraints if any -->
@@ -311,7 +309,7 @@
                                             <i class="fas fa-info-circle"></i>
                                             Votre demande sera soumise pour validation par un administrateur.
                                             <br>
-                                            <strong>Mode test:</strong> Vous pouvez choisir n'importe quelle date pour tester différents scénarios. La date de fin sera calculée automatiquement selon votre type d'adhérent une fois approuvée.
+                                            <!--<strong>Mode test:</strong> Vous pouvez choisir n'importe quelle date pour tester différents scénarios. La date de fin sera calculée automatiquement selon votre type d'adhérent une fois approuvée.!-->
                                         </small>
                                     </div>
                                 </div>
