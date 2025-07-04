@@ -75,6 +75,6 @@ INSERT INTO quota_pret (nombre_livre, nombre_jour_pret, date_changement, id_type
 (7, 5, CURRENT_DATE, 2);  -- professionel: 7 livres, 5 jours
 
 ---Pénalité Configuration
-INSERT INTO penalite_config (nombre_jour, date_changement, id_type_adherent) VALUES 
-(7, CURRENT_DATE, 1),  -- etudiant: 7 jours de pénalité
-(3, CURRENT_DATE, 2);  -- professionel: 3 jours de pénalité
+INSERT INTO penalite_config (id, nombre_jour, date_changement, id_type_adherent) VALUES 
+(1, 7, CURRENT_DATE, 1),  -- etudiant: 7 jours de pénalité
+(2, 3, CURRENT_DATE, 2);  -- professionel: 3 jours de pénalité
