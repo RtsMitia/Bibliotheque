@@ -31,10 +31,11 @@ public interface PretRepository extends JpaRepository<Pret, Long> {
     int countActiveLoansByAdherent(@Param("adherent") Adherent adherent);
     
     /**
-     * Find loans with a specific status
+     * Find loans with a specific status (excluding returned books)
      */
     @Query("SELECT DISTINCT p FROM Pret p JOIN p.statutsPret sp WHERE sp.statut = :statut " +
-           "AND sp.dateChangement = (SELECT MAX(sp2.dateChangement) FROM StatutPret sp2 WHERE sp2.pret = p)")
+           "AND sp.dateChangement = (SELECT MAX(sp2.dateChangement) FROM StatutPret sp2 WHERE sp2.pret = p) " +
+           "AND p.dateRetour IS NULL")
     List<Pret> findLoansWithStatus(@Param("statut") StatutPretEnum statut);
     
     /**
@@ -50,17 +51,19 @@ public interface PretRepository extends JpaRepository<Pret, Long> {
     List<Pret> findLoansDueSoon(@Param("endDate") java.time.LocalDateTime endDate);
     
     /**
-     * Find all pending loan requests (demande status)
+     * Find all pending loan requests (demande status, excluding returned books)
      */
     @Query("SELECT DISTINCT p FROM Pret p JOIN p.statutsPret sp WHERE sp.statut = 'demande' " +
-           "AND sp.dateChangement = (SELECT MAX(sp2.dateChangement) FROM StatutPret sp2 WHERE sp2.pret = p)")
+           "AND sp.dateChangement = (SELECT MAX(sp2.dateChangement) FROM StatutPret sp2 WHERE sp2.pret = p) " +
+           "AND p.dateRetour IS NULL")
     List<Pret> findPendingLoanRequests();
     
     /**
-     * Find loans by adherent and status
+     * Find loans by adherent and status (excluding returned books)
      */
     @Query("SELECT DISTINCT p FROM Pret p JOIN p.statutsPret sp WHERE p.adherent = :adherent AND sp.statut = :statut " +
-           "AND sp.dateChangement = (SELECT MAX(sp2.dateChangement) FROM StatutPret sp2 WHERE sp2.pret = p)")
+           "AND sp.dateChangement = (SELECT MAX(sp2.dateChangement) FROM StatutPret sp2 WHERE sp2.pret = p) " +
+           "AND p.dateRetour IS NULL")
     List<Pret> findByAdherentAndStatus(@Param("adherent") Adherent adherent, @Param("statut") StatutPretEnum statut);
     
     /**
