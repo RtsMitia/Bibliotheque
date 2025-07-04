@@ -41,6 +41,11 @@ public class ProlongementService {
      * Create a new prolongement request with validation
      */
     public Prolongement createProlongement(Pret pret, LocalDateTime dateProlongement) {
+        // Check if this is a "lire sur place" loan - these cannot be extended
+        if (pret.getTypePret() != null && "lire sur place".equalsIgnoreCase(pret.getTypePret().getLibelle())) {
+            throw new RuntimeException("Les prêts 'lire sur place' ne peuvent pas être prolongés car ils sont limités à la journée");
+        }
+        
         // Validate that the request is made before the due date
         if (dateProlongement.isAfter(pret.getDateFin())) {
             throw new RuntimeException("La demande de prolongement ne peut pas être faite après la date d'échéance du prêt");

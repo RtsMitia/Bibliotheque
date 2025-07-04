@@ -275,11 +275,11 @@
                                         <select class="form-select" id="typePretId${livre.id}" name="typePretId" required>
                                             <option value="">Sélectionner le type de prêt...</option>
                                             <c:forEach var="typePret" items="${typesPret}">
-                                                <option value="${typePret.id}">${typePret.libelle}</option>
+                                                <option value="${typePret.id}" data-libelle="${typePret.libelle}">${typePret.libelle}</option>
                                             </c:forEach>
                                         </select>
-                                        <small class="form-text text-muted">
-                                            Votre durée d'emprunt dépend de votre type d'adhérent
+                                        <small class="form-text text-muted" id="loanTypeHelp${livre.id}">
+                                            <strong>À emporter:</strong> Durée selon votre type d'adhérent | <strong>Lire sur place:</strong> Retour le même jour
                                         </small>
                                     </div>
 
@@ -424,6 +424,22 @@
                 infoAlert.innerHTML = '<i class="fas fa-info-circle"></i> <strong>Test:</strong> Emprunt futur commençant dans ' + diffDays + ' jour(s).<br><strong>Note:</strong> La date de fin sera calculée automatiquement selon votre type d\'adhérent une fois approuvée.';
             } else {
                 infoAlert.innerHTML = '<i class="fas fa-flask text-warning"></i> <strong>Mode test:</strong> Emprunt dans le passé (il y a ' + Math.abs(diffDays) + ' jour(s)).<br><strong>Utile pour:</strong> Tester les retards, pénalités, et restrictions d\'emprunt. La date de fin sera calculée automatiquement.';
+            }
+        });
+    });
+
+    // Add loan type selection handler
+    document.querySelectorAll('select[name="typePretId"]').forEach(selectElement => {
+        selectElement.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const libelle = selectedOption.getAttribute('data-libelle');
+            const modal = this.closest('.modal');
+            const infoAlert = modal.querySelector('.alert-info small');
+            
+            if (libelle && libelle.toLowerCase().includes('lire sur place')) {
+                infoAlert.innerHTML = '<i class="fas fa-info-circle text-warning"></i> <strong>Prêt "Lire sur place":</strong> Ce livre doit être retourné le jour même de l\'emprunt.<br><strong>Note:</strong> Aucune prolongation possible pour ce type de prêt.';
+            } else {
+                infoAlert.innerHTML = '<i class="fas fa-info-circle"></i> Votre demande sera soumise pour validation par un administrateur.<br><strong>Mode test:</strong> Vous pouvez choisir n\'importe quelle date pour tester différents scénarios. La date de fin sera calculée automatiquement selon votre type d\'adhérent une fois approuvée.';
             }
         });
     });

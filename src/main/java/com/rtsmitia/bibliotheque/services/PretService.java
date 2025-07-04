@@ -115,12 +115,27 @@ public class PretService {
         
         // Set loan dates - use existing dateDebut if set by client, otherwise use current date
         LocalDateTime dateDebut = (pret.getDateDebut() != null) ? pret.getDateDebut() : LocalDateTime.now();
-        int loanDays = quotaService.getMaxLoanDays(adherent);
-        LocalDateTime calculatedDateFin = dateDebut.plusDays(loanDays);
         
-        // Adjust end date to avoid holidays
-        java.time.LocalDate adjustedEndDate = jourFerieService.adjustLoanEndDate(calculatedDateFin.toLocalDate());
-        LocalDateTime dateFin = adjustedEndDate.atTime(calculatedDateFin.toLocalTime());
+        LocalDateTime calculatedDateFin;
+        // Check if this is a "lire sur place" loan type
+        if (pret.getTypePret() != null && "lire sur place".equalsIgnoreCase(pret.getTypePret().getLibelle())) {
+            // For "lire sur place", end date is the same day (end of day)
+            calculatedDateFin = dateDebut.toLocalDate().atTime(23, 59, 59);
+        } else {
+            // Normal loan duration based on adherent type
+            int loanDays = quotaService.getMaxLoanDays(adherent);
+            calculatedDateFin = dateDebut.plusDays(loanDays);
+        }
+        
+        // Adjust end date to avoid holidays (only for multi-day loans)
+        LocalDateTime dateFin;
+        if (pret.getTypePret() != null && "lire sur place".equalsIgnoreCase(pret.getTypePret().getLibelle())) {
+            // For same-day loans, no holiday adjustment needed
+            dateFin = calculatedDateFin;
+        } else {
+            java.time.LocalDate adjustedEndDate = jourFerieService.adjustLoanEndDate(calculatedDateFin.toLocalDate());
+            dateFin = adjustedEndDate.atTime(calculatedDateFin.toLocalTime());
+        }
         
         pret.setDateDebut(dateDebut);
         pret.setDateFin(dateFin);

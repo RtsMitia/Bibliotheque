@@ -117,7 +117,20 @@
                             <h6><i class="fas fa-book"></i> Livre Demandé</h6>
                             <p class="mb-1"><strong>Titre:</strong> ${pret.exemplaire.livre.titre}</p>
                             <p class="mb-1"><strong>Auteur:</strong> ${pret.exemplaire.livre.auteur.nom}</p>
-                            <p class="mb-0"><strong>Exemplaire:</strong> #${pret.exemplaire.id}</p>
+                            <p class="mb-1"><strong>Exemplaire:</strong> #${pret.exemplaire.id}</p>
+                            <p class="mb-0">
+                                <strong>Type de prêt:</strong> 
+                                <span class="badge ${pret.typePret.libelle == 'lire sur place' ? 'bg-warning text-dark' : 'bg-info'}">
+                                    <c:choose>
+                                        <c:when test="${pret.typePret.libelle == 'lire sur place'}">
+                                            <i class="fas fa-clock"></i> ${pret.typePret.libelle} (retour le jour même)
+                                        </c:when>
+                                        <c:otherwise>
+                                            <i class="fas fa-home"></i> ${pret.typePret.libelle}
+                                        </c:otherwise>
+                                    </c:choose>
+                                </span>
+                            </p>
                         </div>
 
                         <!-- Actions -->
@@ -175,7 +188,20 @@
                             <h6><i class="fas fa-book"></i> Livre Demandé</h6>
                             <p class="mb-1"><strong>Titre:</strong> ${pret.exemplaire.livre.titre}</p>
                             <p class="mb-1"><strong>Auteur:</strong> ${pret.exemplaire.livre.auteur.nom}</p>
-                            <p class="mb-0"><strong>Exemplaire:</strong> #${pret.exemplaire.id}</p>
+                            <p class="mb-1"><strong>Exemplaire:</strong> #${pret.exemplaire.id}</p>
+                            <p class="mb-0">
+                                <strong>Type de prêt:</strong> 
+                                <span class="badge ${pret.typePret.libelle == 'lire sur place' ? 'bg-warning text-dark' : 'bg-info'}">
+                                    <c:choose>
+                                        <c:when test="${pret.typePret.libelle == 'lire sur place'}">
+                                            <i class="fas fa-clock"></i> ${pret.typePret.libelle} (retour le jour même)
+                                        </c:when>
+                                        <c:otherwise>
+                                            <i class="fas fa-home"></i> ${pret.typePret.libelle}
+                                        </c:otherwise>
+                                    </c:choose>
+                                </span>
+                            </p>
                         </div>
 
                         <!-- Actions -->
