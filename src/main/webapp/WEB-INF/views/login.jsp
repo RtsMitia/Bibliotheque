@@ -7,7 +7,7 @@
 <!-- Custom CSS for login page -->
 <style>
     body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-color: #f8f9fa;
         min-height: 100vh;
     }
     .login-container {
@@ -15,95 +15,39 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 2rem 0;
     }
     .login-card {
         background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        overflow: hidden;
-        max-width: 800px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        max-width: 600px;
         width: 100%;
     }
     .login-header {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background-color: #007bff;
         color: white;
-        padding: 3rem 2rem;
+        padding: 2rem;
         text-align: center;
+        border-radius: 8px 8px 0 0;
     }
     .login-body {
-        padding: 3rem 2rem;
+        padding: 2rem;
     }
     .login-option {
-        border: 2px solid #e9ecef;
-        border-radius: 15px;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        background: white;
     }
     .login-option:hover {
         border-color: #007bff;
-        background: white;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,123,255,0.1);
-    }
-    .login-option.client {
-        border-color: #28a745;
-    }
-    .login-option.client:hover {
-        border-color: #28a745;
-        box-shadow: 0 8px 25px rgba(40,167,69,0.1);
-    }
-    .login-option.admin {
-        border-color: #dc3545;
-    }
-    .login-option.admin:hover {
-        border-color: #dc3545;
-        box-shadow: 0 8px 25px rgba(220,53,69,0.1);
+        box-shadow: 0 2px 8px rgba(0,123,255,0.1);
     }
     .login-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-    .client-form .form-control {
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        border: 2px solid #e9ecef;
-        transition: border-color 0.3s ease;
-    }
-    .client-form .form-control:focus {
-        border-color: #28a745;
-        box-shadow: 0 0 0 0.2rem rgba(40,167,69,0.1);
-    }
-    .btn-client {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        border: none;
-        border-radius: 10px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    .btn-client:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(40,167,69,0.3);
-    }
-    .btn-admin {
-        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
-        border: none;
-        border-radius: 10px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    .btn-admin:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(220,53,69,0.3);
-    }
-    .library-features {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-top: 2rem;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
     }
 </style>
 
@@ -124,114 +68,59 @@
         </c:if>
 
         <div class="row justify-content-center">
-            <div class="col-lg-10">
+            <div class="col-lg-8">
                 <div class="login-card">
                     <div class="login-header">
-                        <i class="fas fa-book-open fa-3x mb-3"></i>
-                        <h1 class="mb-2">Système de Bibliothèque</h1>
-                        <p class="mb-0">Bienvenue dans notre système de gestion de bibliothèque</p>
+                        <i class="fas fa-book fa-2x mb-2"></i>
+                        <h2 class="mb-1">Bibliothèque</h2>
+                        <p class="mb-0">Système de gestion</p>
                     </div>
                     
                     <div class="login-body">
-                        <div class="row">
-                            <!-- Client Login -->
-                            <div class="col-md-6">
-                                <div class="login-option client">
-                                    <div class="text-center">
-                                        <i class="fas fa-user login-icon text-success"></i>
-                                        <h3 class="text-success mb-3">Accès Client</h3>
-                                        <p class="text-muted mb-4">
-                                            Connectez-vous avec votre numéro de client pour consulter 
-                                            le catalogue et emprunter des livres.
-                                        </p>
-                                    </div>
-                                    
-                                    <form action="/login/client" method="post" class="client-form">
-                                        <div class="mb-3">
-                                            <label for="numeroClient" class="form-label fw-bold">
-                                                <i class="fas fa-id-card"></i> Numéro de Client
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control" 
-                                                   id="numeroClient" 
-                                                   name="numeroClient"
-                                                   placeholder="Saisissez votre numéro de client"
-                                                   required>
-                                        </div>
-                                        
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-success btn-client">
-                                                <i class="fas fa-sign-in-alt"></i> Se connecter
-                                            </button>
-                                        </div>
-                                    </form>
-                                    
-                                    <div class="mt-3">
-                                        <small class="text-muted">
-                                            <i class="fas fa-info-circle"></i> 
-                                            Fonctionnalités client : Consultation du catalogue, Emprunt de livres
-                                        </small>
-                                    </div>
-                                </div>
+                        <!-- Client Login -->
+                        <div class="login-option">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-user login-icon text-primary"></i>
+                                <h4 class="mb-2">Accès Client</h4>
+                                <p class="text-muted">Connectez-vous avec votre numéro de client</p>
                             </div>
-
-                            <!-- Admin Login -->
-                            <div class="col-md-6">
-                                <div class="login-option admin">
-                                    <div class="text-center">
-                                        <i class="fas fa-user-shield login-icon text-danger"></i>
-                                        <h3 class="text-danger mb-3">Accès Administrateur</h3>
-                                        <p class="text-muted mb-4">
-                                            Accès complet au système de gestion de la bibliothèque 
-                                            avec toutes les fonctionnalités.
-                                        </p>
-                                    </div>
-                                    
-                                    <form action="/login/admin" method="post">
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-danger btn-admin">
-                                                <i class="fas fa-crown"></i> Connexion Administrateur
-                                            </button>
-                                        </div>
-                                    </form>
-                                    
-                                    <div class="mt-3">
-                                        <small class="text-muted">
-                                            <i class="fas fa-tools"></i> 
-                                            Fonctionnalités admin : Gestion complète des livres, exemplaires, utilisateurs
-                                        </small>
-                                    </div>
+                            
+                            <form action="/login/client" method="post">
+                                <div class="mb-3">
+                                    <label for="numeroClient" class="form-label">
+                                        Numéro de Client
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="numeroClient" 
+                                           name="numeroClient"
+                                           placeholder="Votre numéro de client"
+                                           required>
                                 </div>
-                            </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-sign-in-alt"></i> Se connecter
+                                    </button>
+                                </div>
+                            </form>
                         </div>
 
-                        <!-- Features Information -->
-                        <div class="library-features">
-                            <h5 class="text-center mb-3">
-                                <i class="fas fa-star"></i> Fonctionnalités de la Bibliothèque
-                            </h5>
-                            <div class="row text-center">
-                                <div class="col-md-3">
-                                    <i class="fas fa-search fa-2x text-primary mb-2"></i>
-                                    <h6>Recherche</h6>
-                                    <small class="text-muted">Recherchez par titre ou auteur</small>
-                                </div>
-                                <div class="col-md-3">
-                                    <i class="fas fa-bookmark fa-2x text-info mb-2"></i>
-                                    <h6>Réservation</h6>
-                                    <small class="text-muted">Réservez vos livres préférés</small>
-                                </div>
-                                <div class="col-md-3">
-                                    <i class="fas fa-clock fa-2x text-warning mb-2"></i>
-                                    <h6>Suivi</h6>
-                                    <small class="text-muted">Suivez vos emprunts en temps réel</small>
-                                </div>
-                                <div class="col-md-3">
-                                    <i class="fas fa-chart-bar fa-2x text-success mb-2"></i>
-                                    <h6>Statistiques</h6>
-                                    <small class="text-muted">Consultez les statistiques</small>
-                                </div>
+                        <!-- Admin Login -->
+                        <div class="login-option">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-user-shield login-icon text-secondary"></i>
+                                <h4 class="mb-2">Accès Administrateur</h4>
+                                <p class="text-muted">Accès complet au système de gestion</p>
                             </div>
+                            
+                            <form action="/login/admin" method="post">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-secondary">
+                                        <i class="fas fa-cog"></i> Connexion Admin
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -242,33 +131,17 @@
 
 <!-- Custom JavaScript for login page -->
 <script>
-    // Auto-hide alerts after 7 seconds
+    // Auto-hide alerts after 5 seconds
     setTimeout(function() {
         let alerts = document.querySelectorAll('.alert');
         alerts.forEach(function(alert) {
             let bsAlert = new bootstrap.Alert(alert);
             bsAlert.close();
         });
-    }, 7000);
+    }, 5000);
 
-    // Add smooth animations
+    // Focus on client number input when page loads
     document.addEventListener('DOMContentLoaded', function() {
-        // Animate login options on load
-        const loginOptions = document.querySelectorAll('.login-option');
-        loginOptions.forEach((option, index) => {
-            setTimeout(() => {
-                option.style.opacity = '0';
-                option.style.transform = 'translateY(20px)';
-                option.style.transition = 'all 0.5s ease';
-                
-                setTimeout(() => {
-                    option.style.opacity = '1';
-                    option.style.transform = 'translateY(0)';
-                }, 100);
-            }, index * 200);
-        });
-
-        // Focus on client number input
         const clientInput = document.getElementById('numeroClient');
         if (clientInput) {
             clientInput.focus();

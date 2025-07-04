@@ -277,25 +277,7 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h6 class="mb-0">Actions rapides</h6>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-success btn-sm" disabled>
-                            <i class="fas fa-hand-holding"></i> Emprunter
-                        </button>
-                        <button class="btn btn-outline-warning btn-sm" disabled>
-                            <i class="fas fa-bookmark"></i> Réserver
-                        </button>
-                        <a href="/livres/search?searchTerm=${livre.auteur.nom}" class="btn btn-outline-info btn-sm">
-                            <i class="fas fa-search"></i> Autres livres de cet auteur
-                        </a>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 </div>
