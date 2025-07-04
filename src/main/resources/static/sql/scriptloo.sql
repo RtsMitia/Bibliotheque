@@ -216,3 +216,11 @@ CREATE TABLE livre_genre(
    FOREIGN KEY(id_livre) REFERENCES livre(id),
    FOREIGN KEY(id_genre) REFERENCES genre(id)
 );
+
+CREATE TABLE jour_ferie(
+   id SERIAL,
+   date_debut DATE NOT NULL,
+   date_fin DATE,
+   date_creation DATE,
+   PRIMARY KEY(id)
+);
