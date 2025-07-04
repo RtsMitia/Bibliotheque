@@ -183,47 +183,6 @@
                         </span>
                     </div>
                 </div>
-                
-                <div class="col-md-6 mb-4">
-                    <div class="feature-card">
-                        <i class="fas fa-bookmark feature-icon text-muted"></i>
-                        <h6>Mes Emprunts</h6>
-                        <p class="text-muted mb-3">Consultez l'historique de vos emprunts (bientôt disponible)</p>
-                        <span class="text-muted">
-                            <i class="fas fa-clock"></i> Prochainement
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Help Section -->
-            <div class="card mt-4">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0"><i class="fas fa-question-circle"></i> Aide et Support</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Comment emprunter un livre ?</h6>
-                            <ol class="small">
-                                <li>Allez dans le catalogue des livres</li>
-                                <li>Trouvez le livre que vous souhaitez</li>
-                                <li>Cliquez sur "Emprunter ce livre"</li>
-                                <li>Confirmez votre demande</li>
-                                <li>Présentez-vous à l'accueil pour finaliser</li>
-                            </ol>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Informations importantes</h6>
-                            <ul class="small">
-                                <li>Durée d'emprunt standard: 21 jours</li>
-                                <li>Possibilité de prolongation</li>
-                                <li>Amendes en cas de retard</li>
-                                <li>Certains livres ont des contraintes spéciales</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
