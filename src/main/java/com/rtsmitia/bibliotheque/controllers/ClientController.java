@@ -67,6 +67,7 @@ public class ClientController {
         model.addAttribute("livres", livres);
         model.addAttribute("typesPret", typePretService.getAllTypePrets());
         model.addAttribute("currentUser", currentUser);
+        model.addAttribute("currentDate", new java.util.Date());
         model.addAttribute("contentPage", "client-livres");
         model.addAttribute("pageTitle", "Catalogue des Livres");
         return "layout";
@@ -99,6 +100,7 @@ public class ClientController {
         model.addAttribute("typesPret", typePretService.getAllTypePrets());
         model.addAttribute("searchTerm", searchTerm);
         model.addAttribute("currentUser", currentUser);
+        model.addAttribute("currentDate", new java.util.Date());
         model.addAttribute("contentPage", "client-livres");
         model.addAttribute("pageTitle", "Recherche - " + searchTerm);
         return "layout";
