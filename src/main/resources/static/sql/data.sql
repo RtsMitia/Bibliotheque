@@ -79,7 +79,7 @@ INSERT INTO penalite_config (id, nombre_jour, date_changement, id_type_adherent)
 (1, 7, CURRENT_DATE, 1),  -- etudiant: 7 jours de pénalité
 (2, 3, CURRENT_DATE, 2);  -- professionel: 3 jours de pénalité
 
----Jours Fériés (Sample holidays for testing)
+---Jours Fériés
 INSERT INTO jour_ferie (date_debut, date_fin, date_creation) VALUES 
 -- Christmas period (Dec 24-26, 2025)
 ('2025-12-24', '2025-12-26', CURRENT_DATE),
