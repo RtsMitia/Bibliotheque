@@ -180,9 +180,7 @@
                                             data-bs-toggle="modal" data-bs-target="#returnModal${pret.id}">
                                         <i class="fas fa-undo"></i> Marquer comme rendu
                                     </button>
-                                    <a href="/adherents/${pret.adherent.id}" class="btn btn-outline-primary btn-sm action-btn">
-                                        <i class="fas fa-user"></i> Voir adhérent
-                                    </a>
+                                    
                                 </div>
                             </div>
                         </div>
