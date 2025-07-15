@@ -1,12 +1,11 @@
 package com.rtsmitia.bibliotheque.controllers;
 
+import com.rtsmitia.bibliotheque.dto.LivreDetailsDto;
 import com.rtsmitia.bibliotheque.models.Livre;
-import com.rtsmitia.bibliotheque.models.Auteur;
-import com.rtsmitia.bibliotheque.models.Genre;
-import com.rtsmitia.bibliotheque.models.LesContraints;
 import com.rtsmitia.bibliotheque.services.LivreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +15,8 @@ import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/livres")
@@ -216,5 +217,58 @@ public class LivreController {
         model.addAttribute("contentPage", "livre-list");
         model.addAttribute("pageTitle", "Résultats de Recherche");
         return "layout";
+    }
+
+    /**
+     * Display the JSON API demo page
+     */
+    @GetMapping("/api-demo")
+    public String showApiDemo(Model model) {
+        model.addAttribute("contentPage", "livres-api-demo");
+        model.addAttribute("pageTitle", "API Livres - Démonstration");
+        return "layout";
+    }
+
+    // ================= JSON API ENDPOINTS =================
+
+    /**
+     * Get all books as JSON with basic information
+     */
+    @GetMapping("/api/all")
+    @ResponseBody
+    public ResponseEntity<List<LivreDetailsDto>> getAllLivresJson() {
+        List<Livre> livres = livreService.getAllLivres();
+        List<LivreDetailsDto> livresDto = livres.stream()
+                .map(LivreDetailsDto::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(livresDto);
+    }
+
+    /**
+     * Get detailed information about a specific book including its exemplaires and availability
+     */
+    @GetMapping("/api/{id}")
+    @ResponseBody
+    public ResponseEntity<LivreDetailsDto> getLivreDetailsJson(@PathVariable Long id) {
+        Optional<Livre> livreOpt = livreService.getLivreById(id);
+        if (!livreOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        LivreDetailsDto livreDto = new LivreDetailsDto(livreOpt.get());
+        return ResponseEntity.ok(livreDto);
+    }
+
+    /**
+     * Search books by title or author and return JSON
+     */
+    @GetMapping("/api/search")
+    @ResponseBody
+    public ResponseEntity<List<LivreDetailsDto>> searchLivresJson(@RequestParam String searchTerm) {
+        List<Livre> livres = livreService.searchByTitleOrAuthor(searchTerm);
+        List<LivreDetailsDto> livresDto = livres.stream()
+                .map(LivreDetailsDto::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(livresDto);
     }
 }
