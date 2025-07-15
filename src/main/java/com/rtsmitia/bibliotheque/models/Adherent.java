@@ -48,6 +48,9 @@ public class Adherent {
     @OneToMany(mappedBy = "adherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Penalite> penalites;
 
+    @OneToMany(mappedBy = "adherent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AdherentAbonnement> abonnements;
+
     @ManyToMany
     @JoinTable(
         name = "contraint_adherant",
@@ -158,6 +161,14 @@ public class Adherent {
 
     public void setPenalites(List<Penalite> penalites) {
         this.penalites = penalites;
+    }
+
+    public List<AdherentAbonnement> getAbonnements() {
+        return abonnements;
+    }
+
+    public void setAbonnements(List<AdherentAbonnement> abonnements) {
+        this.abonnements = abonnements;
     }
 
     public List<LesContraints> getContraintes() {
