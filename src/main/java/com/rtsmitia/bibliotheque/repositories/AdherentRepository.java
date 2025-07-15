@@ -28,6 +28,11 @@ public interface AdherentRepository extends JpaRepository<Adherent, Integer>{
     
     @Query("SELECT DISTINCT a FROM Adherent a " +
            "JOIN a.historiqueStatuts h " +
-           "WHERE h.statut = :statut")
+           "JOIN a.abonnements ab " +
+           "WHERE h.statut = :statut " +
+           "AND ab.finAbonnement >= CURRENT_DATE " +
+           "AND h.dateChangement = (" +
+           "   SELECT MAX(h2.dateChangement) FROM a.historiqueStatuts h2" +
+           ")")
     List<Adherent> findAdherentsByStatut(@Param("statut") com.rtsmitia.bibliotheque.models.HistoriqueStatutAbonnement.StatutAbonnement statut);
 }
