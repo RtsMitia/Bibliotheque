@@ -8,7 +8,7 @@
 <!-- Custom CSS for this page -->
 <style>
     .page-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
         color: white;
         padding: 2rem 0;
         margin-bottom: 2rem;

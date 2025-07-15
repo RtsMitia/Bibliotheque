@@ -85,6 +85,18 @@ public class Exemplaire {
         return java.util.Date.from(dateArrivee.atZone(java.time.ZoneId.systemDefault()).toInstant());
     }
 
+    /**
+     * Check if this exemplaire is available (not currently borrowed)
+     */
+    public boolean isAvailable() {
+        if (prets == null || prets.isEmpty()) {
+            return true;
+        }
+        
+        // Check if there's any active loan (not returned)
+        return prets.stream().noneMatch(pret -> pret.getDateRetour() == null);
+    }
+
     @Override
     public String toString() {
         return "Exemplaire{" +

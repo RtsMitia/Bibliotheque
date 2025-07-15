@@ -82,7 +82,7 @@ INSERT INTO penalite_config (id, nombre_jour, date_changement, id_type_adherent)
 ---Jours Fériés
 INSERT INTO jour_ferie (date_debut, date_fin, date_creation) VALUES 
 -- Christmas period (Dec 24-26, 2025)
-('2025-12-24', '2025-12-26', CURRENT_DATE),
+('2025-12-24', '2025-12-26', CURRENT_DATE);
 -- New Year period (Dec 31, 2025 - Jan 2, 2026)
 ('2025-12-31', '2026-01-02', CURRENT_DATE),
 -- Easter period (April 20-21, 2026) 

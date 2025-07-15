@@ -29,7 +29,15 @@ public interface StatutPretRepository extends JpaRepository<StatutPret, Long> {
      * Find the current (latest) status for a specific loan
      */
     @Query("SELECT sp FROM StatutPret sp WHERE sp.pret = :pret ORDER BY sp.dateChangement DESC")
-    Optional<StatutPret> findCurrentStatusByPret(@Param("pret") Pret pret);
+    List<StatutPret> findByPretOrderByDateChangementDescList(@Param("pret") Pret pret);
+    
+    /**
+     * Find the current (latest) status for a specific loan (single result)
+     */
+    default Optional<StatutPret> findCurrentStatusByPret(Pret pret) {
+        List<StatutPret> results = findByPretOrderByDateChangementDescList(pret);
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
     
     /**
      * Find all loans with a specific status

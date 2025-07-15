@@ -204,6 +204,21 @@ public class ExemplaireService {
     }
 
     /**
+     * Get all exemplaires with prets loaded for availability checking
+     */
+    @Transactional(readOnly = true)
+    public List<Exemplaire> getAllExemplairesWithPrets() {
+        List<Exemplaire> exemplaires = exemplaireRepository.findAllByOrderByDateArriveeDesc();
+        // Force loading of prets for availability checking
+        exemplaires.forEach(exemplaire -> {
+            if (exemplaire.getPrets() != null) {
+                exemplaire.getPrets().size(); // This triggers loading
+            }
+        });
+        return exemplaires;
+    }
+
+    /**
      * Inner class for exemplaire statistics
      */
     public static class ExemplaireStats {

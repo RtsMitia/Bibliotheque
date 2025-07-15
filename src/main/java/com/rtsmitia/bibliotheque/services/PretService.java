@@ -70,12 +70,12 @@ public class PretService {
         // dateFin and dateRetour remain null until approved
         
         // Save the loan request
-        Pret savedPret = pretRepository.save(pret);
+        //Pret savedPret = pretRepository.save(pret);
         
         // Create initial status as "demande"
-        statutPretService.createStatus(savedPret, StatutPretEnum.demande);
+        //statutPretService.createStatus(savedPret, StatutPretEnum.demande);
         
-        return savedPret;
+        return pret;
     }
     
     /**

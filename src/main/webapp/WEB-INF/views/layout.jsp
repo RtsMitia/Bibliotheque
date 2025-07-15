@@ -245,18 +245,6 @@
                             </div>
                         </div>
                         
-                        <!-- Exemplaires Section -->
-                        <div class="nav-section">
-                            <button class="nav-section-header" onclick="toggleSection('exemplaires-section')">
-                                <span><i class="fas fa-copy"></i> Exemplaires</span>
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                            </button>
-                            <div class="nav-section-content" id="exemplaires-section">
-                                <a href="${pageContext.request.contextPath}/exemplaires/list"><i class="fas fa-list"></i> Liste des Exemplaires</a>
-                                <a href="${pageContext.request.contextPath}/exemplaires/add"><i class="fas fa-plus"></i> Ajouter un Exemplaire</a>
-                            </div>
-                        </div>
-                        
                         <!-- Prêts Section -->
                         <div class="nav-section">
                             <button class="nav-section-header" onclick="toggleSection('prets-section')">
@@ -266,6 +254,17 @@
                             <div class="nav-section-content" id="prets-section">
                                 <a href="${pageContext.request.contextPath}/prets/demandes"><i class="fas fa-clipboard-list"></i> Demandes de Prêt</a>
                                 <a href="${pageContext.request.contextPath}/prets/actifs"><i class="fas fa-book-open"></i> Prêts Actifs</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Réservations Section -->
+                        <div class="nav-section">
+                            <button class="nav-section-header" onclick="toggleSection('reservations-section')">
+                                <span><i class="fas fa-calendar-check"></i> Gestion des Réservations</span>
+                                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                            </button>
+                            <div class="nav-section-content" id="reservations-section">
+                                <a href="${pageContext.request.contextPath}/reservations/admin/panel"><i class="fas fa-shield-alt"></i> Panneau Admin</a>
                             </div>
                         </div>
                         
@@ -295,6 +294,7 @@
                             </c:if>
                         </div>
                         <a href="${pageContext.request.contextPath}/client/livres"><i class="fas fa-book"></i> Catalogue des Livres</a>
+                        <a href="${pageContext.request.contextPath}/reservations/faire-reservation"><i class="fas fa-calendar-plus"></i> Faire une Réservation</a>
                         <a href="${pageContext.request.contextPath}/client/profile"><i class="fas fa-user"></i> Mon Profil</a>
                         
                         <!-- Logout -->
@@ -360,6 +360,17 @@
             
             livresSection.classList.add('active');
             livresHeader.classList.add('active');
+        }
+        
+        // Check if we're on a reservations page
+        if (currentPath.includes('/reservations/')) {
+            const reservationsSection = document.getElementById('reservations-section');
+            if (reservationsSection) {
+                const reservationsHeader = reservationsSection.previousElementSibling;
+                
+                reservationsSection.classList.add('active');
+                reservationsHeader.classList.add('active');
+            }
         }
     });
 </script>

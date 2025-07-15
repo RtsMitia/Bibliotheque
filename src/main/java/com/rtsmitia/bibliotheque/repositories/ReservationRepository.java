@@ -41,7 +41,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r " +
            "JOIN r.statutReservations sr " +
            "WHERE r.adherent = :adherent " +
-           "AND sr.statut IN ('en attente', 'confirmée') " +
+           "AND sr.statut IN ('en attente') " +
            "AND sr.dateChangement = (SELECT MAX(sr2.dateChangement) FROM StatutReservation sr2 WHERE sr2.reservation = r)")
     List<Reservation> findActiveReservationsByAdherent(@Param("adherent") Adherent adherent);
 
@@ -51,7 +51,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT COUNT(r) FROM Reservation r " +
            "JOIN r.statutReservations sr " +
            "WHERE r.adherent = :adherent " +
-           "AND sr.statut IN ('en attente', 'confirmée') " +
+           "AND sr.statut IN ('confirmee') " +
            "AND sr.dateChangement = (SELECT MAX(sr2.dateChangement) FROM StatutReservation sr2 WHERE sr2.reservation = r)")
     int countActiveReservationsByAdherent(@Param("adherent") Adherent adherent);
 
@@ -78,7 +78,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      */
     @Query("SELECT DISTINCT r FROM Reservation r " +
            "JOIN r.statutReservations sr " +
-           "WHERE sr.statut = 'confirmée' " +
+           "WHERE sr.statut = 'confirmee' " +
            "AND sr.dateChangement = (SELECT MAX(sr2.dateChangement) FROM StatutReservation sr2 WHERE sr2.reservation = r)")
     List<Reservation> findConfirmedReservations();
 
@@ -87,7 +87,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      */
     @Query("SELECT DISTINCT r FROM Reservation r " +
            "JOIN r.statutReservations sr " +
-           "WHERE sr.statut = 'expirée' " +
+           "WHERE sr.statut = 'expiree' " +
            "AND sr.dateChangement = (SELECT MAX(sr2.dateChangement) FROM StatutReservation sr2 WHERE sr2.reservation = r)")
     List<Reservation> findExpiredReservations();
 
@@ -111,7 +111,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT COUNT(r) > 0 FROM Reservation r " +
            "WHERE r.adherent = :adherent AND r.exemplaire = :exemplaire " +
            "AND EXISTS (SELECT sr FROM StatutReservation sr WHERE sr.reservation = r " +
-           "AND sr.statut IN ('en attente', 'confirmée') " +
+           "AND sr.statut IN ('en attente', 'confirmee') " +
            "AND sr.dateChangement = (SELECT MAX(sr2.dateChangement) FROM StatutReservation sr2 WHERE sr2.reservation = r))")
     boolean hasActiveReservationForExemplaire(@Param("adherent") Adherent adherent, 
                                             @Param("exemplaire") Exemplaire exemplaire);
@@ -134,11 +134,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByAdherentNumeroAdherent(@Param("numeroAdherent") String numeroAdherent);
 
     /**
-     * Find all active reservations (en attente or confirmée)
+     * Find all active reservations (en attente or confirmee)
      */
     @Query("SELECT DISTINCT r FROM Reservation r " +
            "JOIN r.statutReservations sr " +
-           "WHERE sr.statut IN ('en attente', 'confirmée') " +
+           "WHERE sr.statut IN ('en attente', 'confirmee') " +
            "AND sr.dateChangement = (SELECT MAX(sr2.dateChangement) FROM StatutReservation sr2 WHERE sr2.reservation = r)")
     List<Reservation> findActiveReservations();
 
@@ -153,7 +153,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r " +
            "JOIN r.statutReservations sr " +
            "WHERE r.exemplaire = :exemplaire " +
-           "AND sr.statut IN ('en attente', 'confirmée') " +
+           "AND sr.statut IN ('en attente', 'confirmee') " +
            "AND sr.dateChangement = (SELECT MAX(sr2.dateChangement) FROM StatutReservation sr2 WHERE sr2.reservation = r) " +
            "ORDER BY r.dateReservation ASC")
     List<Reservation> findActiveReservationsByExemplaire(@Param("exemplaire") Exemplaire exemplaire);
@@ -164,7 +164,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r " +
            "JOIN r.statutReservations sr " +
            "WHERE r.dateDebutPret <= :limitDate " +
-           "AND sr.statut = 'confirmée' " +
+           "AND sr.statut = 'confirmee' " +
            "AND sr.dateChangement = (SELECT MAX(sr2.dateChangement) FROM StatutReservation sr2 WHERE sr2.reservation = r)")
     List<Reservation> findReservationsExpiringSoon(@Param("limitDate") LocalDateTime limitDate);
 }

@@ -74,8 +74,9 @@ public class ReservationController {
         try {
             List<Reservation> reservations = reservationService.getAllReservations();
             model.addAttribute("reservations", reservations);
+            model.addAttribute("contentPage", "reservation-list");
             model.addAttribute("pageTitle", "Gestion des Réservations");
-            return "reservation-list";
+            return "layout";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors du chargement des réservations: " + e.getMessage());
             return "error";
@@ -90,9 +91,10 @@ public class ReservationController {
         try {
             List<Reservation> activeReservations = reservationService.getActiveReservations();
             model.addAttribute("reservations", activeReservations);
+            model.addAttribute("contentPage", "reservation-list");
             model.addAttribute("pageTitle", "Réservations Actives");
             model.addAttribute("isActiveView", true);
-            return "reservation-list";
+            return "layout";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors du chargement des réservations actives: " + e.getMessage());
             return "error";
@@ -111,9 +113,10 @@ public class ReservationController {
             model.addAttribute("reservation", new Reservation());
             model.addAttribute("adherents", adherents);
             model.addAttribute("exemplaires", exemplaires);
+            model.addAttribute("contentPage", "reservation-form");
             model.addAttribute("pageTitle", "Nouvelle Réservation");
             model.addAttribute("isEdit", false);
-            return "reservation-form";
+            return "layout";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors du chargement du formulaire: " + e.getMessage());
             return "error";
@@ -183,9 +186,10 @@ public class ReservationController {
             model.addAttribute("reservation", reservation);
             model.addAttribute("statusHistory", statusHistory);
             model.addAttribute("currentStatus", currentStatus.orElse(null));
+            model.addAttribute("contentPage", "reservation-details");
             model.addAttribute("pageTitle", "Détails de la Réservation #" + id);
             
-            return "reservation-details";
+            return "layout";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors du chargement des détails: " + e.getMessage());
             return "error";
@@ -210,10 +214,11 @@ public class ReservationController {
             model.addAttribute("reservation", reservationOpt.get());
             model.addAttribute("adherents", adherents);
             model.addAttribute("exemplaires", exemplaires);
+            model.addAttribute("contentPage", "reservation-form");
             model.addAttribute("pageTitle", "Modifier la Réservation #" + id);
             model.addAttribute("isEdit", true);
             
-            return "reservation-form";
+            return "layout";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors du chargement du formulaire d'édition: " + e.getMessage());
             return "error";
@@ -359,9 +364,10 @@ public class ReservationController {
             model.addAttribute("searchStartDate", startDate);
             model.addAttribute("searchEndDate", endDate);
             model.addAttribute("searchStatut", statut);
+            model.addAttribute("contentPage", "reservation-list");
             model.addAttribute("pageTitle", "Recherche de Réservations");
             
-            return "reservation-list";
+            return "layout";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de la recherche: " + e.getMessage());
             return "error";
@@ -376,14 +382,202 @@ public class ReservationController {
         try {
             List<Reservation> expiringReservations = reservationService.findReservationsExpiringSoon(days);
             model.addAttribute("reservations", expiringReservations);
+            model.addAttribute("contentPage", "reservation-list");
             model.addAttribute("pageTitle", "Réservations Expirant dans " + days + " jours");
             model.addAttribute("isExpiringView", true);
             model.addAttribute("daysAhead", days);
             
-            return "reservation-list";
+            return "layout";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de la récupération des réservations expirant bientôt: " + e.getMessage());
             return "error";
         }
     }
+
+    /**
+     * User-facing reservation page (public)
+     * Note: numero_adherent is not needed as input - it comes from the session
+     */
+    @GetMapping("/faire-reservation")
+    public String showUserReservationForm(Model model) {
+        try {
+            List<Exemplaire> availableExemplaires = exemplaireService.getAllExemplairesWithPrets();
+            
+            model.addAttribute("reservation", new Reservation());
+            model.addAttribute("exemplaires", availableExemplaires);
+            model.addAttribute("contentPage", "user-reservation-form");
+            model.addAttribute("pageTitle", "Faire une Réservation");
+            model.addAttribute("isUserForm", true);
+            return "layout";
+        } catch (Exception e) {
+            model.addAttribute("error", "Erreur lors du chargement du formulaire: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    /**
+     * Create a reservation from user interface
+     */
+    @PostMapping("/faire-reservation")
+    public String createUserReservation(@RequestParam("exemplaireId") Long exemplaireId,
+                                      @RequestParam("dateDebutPret") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime dateDebutPret,
+                                      @RequestParam(value = "dateReservation", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime dateReservation,
+                                      HttpSession session,
+                                      RedirectAttributes redirectAttributes) {
+        
+        // Check client access
+        if (!LoginController.checkClientAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+        
+        try {
+            Adherent sessionAdherent = (Adherent) session.getAttribute("currentAdherent");
+            
+            // Reload adherent with contraintes from database
+            Optional<Adherent> adherentOpt = adherentService.getAdherentWithContraintes(sessionAdherent.getId());
+            if (adherentOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Adhérent introuvable.");
+                return "redirect:/client/livres";
+            }
+            
+            Adherent adherent = adherentOpt.get();
+
+            // Validate input
+            if (exemplaireId == null) {
+                redirectAttributes.addFlashAttribute("error", "Veuillez sélectionner un livre");
+                return "redirect:/reservations/faire-reservation";
+            }
+
+            if (dateDebutPret == null) {
+                redirectAttributes.addFlashAttribute("error", "La date de début de prêt est requise");
+                return "redirect:/reservations/faire-reservation";
+            }
+
+            // Get exemplaire
+            Optional<Exemplaire> exemplaireOpt = exemplaireService.getExemplaireById(exemplaireId);
+            if (exemplaireOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Exemplaire introuvable.");
+                return "redirect:/reservations/faire-reservation";
+            }
+
+            // Create reservation without business rule validation
+            Reservation reservation = reservationService.createReservation(adherent.getNumeroAdherent(), exemplaireId, dateDebutPret, dateReservation);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Votre réservation a été créée avec succès! Elle est en attente d'approbation par l'administrateur. Numéro de réservation: " + reservation.getId());
+            return "redirect:/reservations/mes-reservations";
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors de la création de la réservation: " + e.getMessage());
+            return "redirect:/reservations/faire-reservation";
+        }
+    }
+
+    /**
+     * User's personal reservations page
+     */
+    @GetMapping("/mes-reservations")
+    public String showUserReservations(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        // Check client access
+        if (!LoginController.checkClientAccess(session, redirectAttributes)) {
+            return "redirect:/login";
+        }
+
+        try {
+            Adherent sessionAdherent = (Adherent) session.getAttribute("currentAdherent");
+            List<Reservation> userReservations = reservationService.getReservationsByAdherentNumero(sessionAdherent.getNumeroAdherent());
+            
+            model.addAttribute("reservations", userReservations);
+            model.addAttribute("numeroAdherent", sessionAdherent.getNumeroAdherent());
+            model.addAttribute("contentPage", "user-reservations");
+            model.addAttribute("pageTitle", "Mes Réservations");
+            model.addAttribute("isUserView", true);
+            return "layout";
+        } catch (Exception e) {
+            model.addAttribute("error", "Erreur lors du chargement de vos réservations: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    /**
+     * Admin panel for managing reservations
+     */
+    @GetMapping("/admin/panel")
+    public String showAdminPanel(Model model) {
+        try {
+            List<Reservation> pendingReservations = reservationService.getPendingReservationsForApproval();
+            List<Reservation> confirmedReservations = reservationService.getReservationsByStatus("confirmee");
+            
+            model.addAttribute("pendingReservations", pendingReservations);
+            model.addAttribute("confirmedReservations", confirmedReservations);
+            model.addAttribute("contentPage", "admin-reservations-panel");
+            model.addAttribute("pageTitle", "Gestion des Réservations - Admin");
+            return "layout";
+        } catch (Exception e) {
+            model.addAttribute("error", "Erreur lors du chargement du panneau admin: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    /**
+     * Admin approves a reservation
+     */
+    @PostMapping("/admin/{id}/approuver")
+    public String approveReservation(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            reservationService.approveReservation(id);
+            redirectAttributes.addFlashAttribute("success", "Réservation approuvée avec succès!");
+            return "redirect:/reservations/admin/panel";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors de l'approbation: " + e.getMessage());
+            return "redirect:/reservations/admin/panel";
+        }
+    }
+
+    /**
+     * Admin rejects a reservation
+     */
+    @PostMapping("/admin/{id}/rejeter")
+    public String rejectReservation(@PathVariable Long id, 
+                                  @RequestParam(value = "reason", defaultValue = "Rejeté par l'administrateur") String reason,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            reservationService.rejectReservation(id, reason);
+            redirectAttributes.addFlashAttribute("success", "Réservation rejetée!");
+            return "redirect:/reservations/admin/panel";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors du rejet: " + e.getMessage());
+            return "redirect:/reservations/admin/panel";
+        }
+    }
+
+    /**
+     * Convert confirmed reservation to actual loan
+     */
+    @PostMapping("/admin/{id}/convertir-pret")
+    public String convertToPret(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            reservationService.convertReservationToPret(id);
+            redirectAttributes.addFlashAttribute("success", "Réservation convertie en prêt avec succès!");
+            return "redirect:/reservations/admin/panel";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors de la conversion: " + e.getMessage());
+            return "redirect:/reservations/admin/panel";
+        }
+    }
+
+    /**
+     * Get reservations by status for admin (AJAX)
+     */
+    @GetMapping("/admin/by-status/{status}")
+    @ResponseBody
+    public List<Reservation> getReservationsByStatusAdmin(@PathVariable String status) {
+        try {
+            return reservationService.getReservationsByStatus(status);
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des réservations: " + e.getMessage());
+        }
+    }
+
+    // ...existing code...
 }

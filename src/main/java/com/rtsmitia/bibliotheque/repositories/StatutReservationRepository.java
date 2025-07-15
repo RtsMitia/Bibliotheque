@@ -46,14 +46,30 @@ public interface StatutReservationRepository extends JpaRepository<StatutReserva
      */
     @Query(value = "SELECT sr FROM StatutReservation sr WHERE sr.reservation = :reservation " +
            "ORDER BY sr.dateChangement DESC")
-    Optional<StatutReservation> findLatestByReservation(@Param("reservation") Reservation reservation);
+    List<StatutReservation> findByReservationOrderByDateChangementDescList(@Param("reservation") Reservation reservation);
+    
+    /**
+     * Find the latest status for a specific reservation (single result)
+     */
+    default Optional<StatutReservation> findLatestByReservation(Reservation reservation) {
+        List<StatutReservation> results = findByReservationOrderByDateChangementDescList(reservation);
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
 
     /**
      * Find the latest status for a reservation by ID
      */
     @Query(value = "SELECT sr FROM StatutReservation sr WHERE sr.reservation.id = :reservationId " +
            "ORDER BY sr.dateChangement DESC")
-    Optional<StatutReservation> findLatestByReservationId(@Param("reservationId") Long reservationId);
+    List<StatutReservation> findByReservationIdOrderByDateChangementDesc(@Param("reservationId") Long reservationId);
+    
+    /**
+     * Find the latest status for a reservation by ID (single result)
+     */
+    default Optional<StatutReservation> findLatestByReservationId(Long reservationId) {
+        List<StatutReservation> results = findByReservationIdOrderByDateChangementDesc(reservationId);
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
 
     /**
      * Find all reservations with a specific current status
