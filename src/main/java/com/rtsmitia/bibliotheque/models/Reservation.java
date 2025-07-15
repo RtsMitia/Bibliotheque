@@ -2,6 +2,8 @@ package com.rtsmitia.bibliotheque.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -98,6 +100,21 @@ public class Reservation {
                 ", exemplaire=" + (exemplaire != null ? exemplaire.getId() : null) +
                 ", adherent=" + (adherent != null ? adherent.getNumeroAdherent() : null) +
                 '}';
+    }
+
+    // Helper methods for JSP date formatting
+    public Date getDateReservationAsDate() {
+        if (this.dateReservation == null) {
+            return null;
+        }
+        return Date.from(this.dateReservation.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public Date getDateDebutPretAsDate() {
+        if (this.dateDebutPret == null) {
+            return null;
+        }
+        return Date.from(this.dateDebutPret.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     @Override

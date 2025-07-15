@@ -200,12 +200,10 @@ CREATE TABLE statut_prolongement(
    FOREIGN KEY(id_prolongement) REFERENCES prolongement(id)
 );
 
-CREATE TABLE contraint(
+CREATE TABLE les_contraint(
    id SERIAL,
-   age INT,
-   id_livre INT NOT NULL,
-   PRIMARY KEY(id),
-   FOREIGN KEY(id_livre) REFERENCES livre(id)
+   type_contrainte VARCHAR(50) NOT NULL,
+   PRIMARY KEY(id)
 );
 
 CREATE TABLE livre_genre(
@@ -223,4 +221,21 @@ CREATE TABLE jour_ferie(
    date_fin DATE,
    date_creation DATE,
    PRIMARY KEY(id)
+);
+
+CREATE TABLE livre_contraint(
+   id_livre SERIAL,
+   id_contraint int,
+   PRIMARY KEY(id_livre, id_contraint),
+   FOREIGN KEY(id_livre) REFERENCES livre(id),
+   FOREIGN KEY(id_contraint) REFERENCES les_contraint(id)
+);
+
+CREATE TABLE contraint_adherant(
+   id SERIAL,
+   numero_adherent int,
+   id_contraint int,
+   PRIMARY KEY(id),
+   FOREIGN KEY(numero_adherent) REFERENCES adherents(id),
+   FOREIGN KEY(id_contraint) REFERENCES les_contraint(id)
 );

@@ -8,34 +8,86 @@
 <!-- Custom CSS for this page -->
 <style>
     .page-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
         color: white;
         padding: 2rem 0;
         margin-bottom: 2rem;
     }
     .book-card {
-        transition: transform 0.2s;
-        border: none;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        background: #fff;
     }
     .book-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        border-color: #dee2e6;
     }
     .search-box {
-        background: white;
-        border-radius: 10px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
         padding: 1.5rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         margin-bottom: 2rem;
+    }
+    .book-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+    .book-meta {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    .book-description {
+        color: #495057;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        margin-bottom: 0.75rem;
     }
     .genre-badge {
         font-size: 0.75rem;
         margin: 0.2rem;
+        background-color: #e9ecef;
+        color: #495057;
+        border: none;
     }
     .constraint-badge {
         font-size: 0.75rem;
         margin: 0.2rem;
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    .btn-outline-primary {
+        border-color: #2c3e50;
+        color: #2c3e50;
+    }
+    .btn-outline-primary:hover {
+        background-color: #2c3e50;
+        border-color: #2c3e50;
+    }
+    .btn-outline-warning {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+    .btn-outline-warning:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    .btn-outline-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    .stats-card {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
     }
 </style>
 
@@ -101,15 +153,13 @@
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card book-card h-100">
                         <div class="card-body">
-                            <h5 class="card-title text-primary">${livre.titre}</h5>
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    <i class="fas fa-user"></i> ${livre.auteur.nom}
-                                </small>
+                            <h5 class="book-title">${livre.titre}</h5>
+                            <p class="book-meta">
+                                <i class="fas fa-user"></i> ${livre.auteur.nom}
                             </p>
                             
                             <c:if test="${not empty livre.resume}">
-                                <p class="card-text">
+                                <p class="book-description">
                                     <c:choose>
                                         <c:when test="${livre.resume.length() > 100}">
                                             ${livre.resume.substring(0, 100)}...
@@ -121,18 +171,16 @@
                                 </p>
                             </c:if>
 
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar"></i> 
-                                    <fmt:formatDate value="${livre.dateSortieAsDate}" pattern="dd/MM/yyyy"/>
-                                </small>
+                            <p class="book-meta">
+                                <i class="fas fa-calendar"></i> 
+                                <fmt:formatDate value="${livre.dateSortieAsDate}" pattern="dd/MM/yyyy"/>
                             </p>
 
                             <!-- Genres -->
                             <c:if test="${not empty livre.genres}">
                                 <div class="mb-2">
                                     <c:forEach var="genre" items="${livre.genres}">
-                                        <span class="badge bg-info genre-badge">${genre.libelle}</span>
+                                        <span class="badge genre-badge">${genre.libelle}</span>
                                     </c:forEach>
                                 </div>
                             </c:if>
@@ -141,7 +189,7 @@
                             <c:if test="${not empty livre.contraintes}">
                                 <div class="mb-2">
                                     <c:forEach var="contrainte" items="${livre.contraintes}">
-                                        <span class="badge bg-warning text-dark constraint-badge">
+                                        <span class="badge constraint-badge">
                                             <i class="fas fa-exclamation-triangle"></i> ${contrainte.typeContrainte}
                                         </span>
                                     </c:forEach>
@@ -149,11 +197,9 @@
                             </c:if>
 
                             <!-- Exemplaires count -->
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    <i class="fas fa-copy"></i> 
-                                    ${livre.exemplaires != null ? livre.exemplaires.size() : 0} exemplaire(s)
-                                </small>
+                            <p class="book-meta">
+                                <i class="fas fa-copy"></i> 
+                                ${livre.exemplaires != null ? livre.exemplaires.size() : 0} exemplaire(s)
                             </p>
                         </div>
                         
@@ -222,10 +268,10 @@
         <c:if test="${not empty livres}">
             <div class="row mt-4">
                 <div class="col">
-                    <div class="card">
+                    <div class="card stats-card">
                         <div class="card-body text-center">
-                            <h5 class="card-title">Statistiques</h5>
-                            <p class="card-text">
+                            <h5 class="card-title" style="color: #2c3e50;">Statistiques</h5>
+                            <p class="card-text" style="color: #6c757d;">
                                 <strong>${livres.size()}</strong> livre(s) 
                                 <c:if test="${not empty searchTerm}">trouvé(s)</c:if>
                                 <c:if test="${empty searchTerm}">au total</c:if>

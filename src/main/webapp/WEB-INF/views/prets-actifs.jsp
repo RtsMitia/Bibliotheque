@@ -8,7 +8,7 @@
 <!-- Custom CSS for loans management view -->
 <style>
     .page-header {
-        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+        background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
         color: white;
         padding: 2rem 0;
         margin-bottom: 2rem;
@@ -70,9 +70,7 @@
                 <a href="/prets/demandes" class="btn btn-light me-2">
                     <i class="fas fa-hourglass-half"></i> Demandes en attente
                 </a>
-                <a href="/admin/dashboard" class="btn btn-outline-light me-2">
-                    <i class="fas fa-tachometer-alt"></i> Tableau de bord
-                </a>
+        
                 <form action="/logout" method="post" style="display: inline;">
                     <button type="submit" class="btn btn-light">
                         <i class="fas fa-sign-out-alt"></i> Se déconnecter
@@ -182,9 +180,7 @@
                                             data-bs-toggle="modal" data-bs-target="#returnModal${pret.id}">
                                         <i class="fas fa-undo"></i> Marquer comme rendu
                                     </button>
-                                    <a href="/adherents/${pret.adherent.id}" class="btn btn-outline-primary btn-sm action-btn">
-                                        <i class="fas fa-user"></i> Voir adhérent
-                                    </a>
+                                    
                                 </div>
                             </div>
                         </div>

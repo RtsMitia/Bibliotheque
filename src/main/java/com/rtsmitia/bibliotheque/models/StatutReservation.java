@@ -24,9 +24,9 @@ public class StatutReservation {
     // Enum for status types
     public enum StatutType {
         ATTENTE("en attente"),
-        CONFIRMEE("confirmée"),
-        ANNULEE("annulée"),
-        EXPIREE("expirée");
+        CONFIRMEE("confirmee"),
+        ANNULEE("annulee"),
+        EXPIREE("expiree");
 
         private final String libelle;
 
