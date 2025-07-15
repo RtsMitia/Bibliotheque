@@ -70,12 +70,12 @@ public class PretService {
         // dateFin and dateRetour remain null until approved
         
         // Save the loan request
-        //Pret savedPret = pretRepository.save(pret);
+        Pret savedPret = pretRepository.save(pret);
         
         // Create initial status as "demande"
-        //statutPretService.createStatus(savedPret, StatutPretEnum.demande);
+        statutPretService.createStatus(savedPret, StatutPretEnum.demande);
         
-        return pret;
+        return savedPret;
     }
     
     /**
@@ -318,7 +318,7 @@ public class PretService {
         // Check if return is late and apply penalty if needed
         if (pret.getDateFin() != null && returnDate.isAfter(pret.getDateFin())) {
             long daysLate = java.time.temporal.ChronoUnit.DAYS.between(pret.getDateFin().toLocalDate(), returnDate.toLocalDate());
-            String penaltyMessage = penaliteService.applyLatePenalty(adherent, (int) daysLate);
+            String penaltyMessage = penaliteService.applyLatePenalty(adherent, (int) daysLate, returnDate.toLocalDate());
             
             return new BookReturnResult(true, 
                 String.format("Livre retourné avec succès. ATTENTION: Retour en retard de %d jour(s). %s", 

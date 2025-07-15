@@ -116,7 +116,7 @@ public class PenaliteService {
     /**
      * Apply penalty for late book return
      */
-    public String applyLatePenalty(Adherent adherent, int daysLate) {
+    public String applyLatePenalty(Adherent adherent, int daysLate, LocalDate dateRetour) {
         // Get penalty configuration for adherent type
         Optional<PenaliteConfig> configOpt = penaliteConfigRepository.findByTypeAdherent(adherent.getTypeAdherent());
         if (configOpt.isEmpty()) {
@@ -127,7 +127,7 @@ public class PenaliteService {
         int penaltyDays = config.getNombreJour();
         
         // Calculate penalty period
-        LocalDate startDate = LocalDate.now();
+        LocalDate startDate = dateRetour;
         LocalDate endDate = startDate.plusDays(penaltyDays);
         
         // Create penalty
