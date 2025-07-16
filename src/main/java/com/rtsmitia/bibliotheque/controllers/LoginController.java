@@ -63,11 +63,11 @@ public class LoginController {
             Adherent adherent = adherentOpt.get();
 
             // Check if the adherent has a valid subscription and can borrow
-            if (!adherentService.hasValidSubscription(adherent)) {
+            /*if (!adherentService.hasValidSubscription(adherent)) {
                 redirectAttributes.addFlashAttribute("errorMessage", 
                     "Votre abonnement n'est pas actif. Veuillez contacter l'administration.");
                 return "redirect:/login";
-            }
+            }*/
 
             // Create client user with additional info
             User user = new User(numeroClient.trim(), "CLIENT");

@@ -25,6 +25,14 @@ DROP TABLE IF EXISTS type_pret CASCADE;
 DROP TABLE IF EXISTS genre CASCADE;
 DROP TABLE IF EXISTS auteur CASCADE;
 DROP TABLE IF EXISTS type_adherent CASCADE;
+DROP TABLE IF EXISTS contraint_adherant;
+DROP TABLE IF EXISTS historique_statut_abonnement;
+DROP TABLE IF EXISTS jour_ferie;
+DROP TABLE IF EXISTS les_contraint;
+DROP TABLE IF EXISTS livre_contraint;
+DROP TABLE IF EXISTS statut_pret;
+
+
 
 -- Drop the sequence if it exists
 DROP SEQUENCE IF EXISTS sequence_adherents CASCADE;
