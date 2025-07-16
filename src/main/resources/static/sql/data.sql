@@ -33,20 +33,6 @@ INSERT INTO quota_pret (nombre_livre, nombre_jour_pret, date_changement, id_type
 (3, 9, CURRENT_DATE, 3),  -- professionel: 3 livres, 9 jours
 (4, 12, CURRENT_DATE, 2); 
 
-CREATE TABLE quota_reservation(
-   id SERIAL,
-   nombre_livre INT,
-   date_changement DATE,
-   id_type_adherent INT NOT NULL,
-   PRIMARY KEY(id),
-   FOREIGN KEY(id_type_adherent) REFERENCES type_adherent(id)
-);
-
-INSERT INTO quota_reservation (nombre_livre, date_changement, id_type_adherent) VALUES 
-(1, CURRENT_DATE, 1),
-(2, CURRENT_DATE, 3),
-(3, CURRENT_DATE, 2);
-
 ---Pénalité Configuration
 INSERT INTO penalite_config (id, nombre_jour, date_changement, id_type_adherent) VALUES 
 (1, 10, CURRENT_DATE, 1),  -- etudiant: 7 jours de pénalité
