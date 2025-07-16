@@ -155,6 +155,15 @@ CREATE TABLE pret(
    FOREIGN KEY(id_exemplaire) REFERENCES exemplaire(id)
 );
 
+CREATE TABLE statut_pret(
+   id SERIAL,
+   statut VARCHAR(50) NOT NULL CHECK (statut IN ('demande', 'en_attente', 'valide', 'refuse')),
+   date_changement VARCHAR(50) NOT NULL,
+   id_pret INT NOT NULL,
+   PRIMARY KEY(id),
+   FOREIGN KEY(id_pret) REFERENCES pret(id)
+);
+
 CREATE TABLE prolongement(
    id SERIAL,
    date_plg DATE,

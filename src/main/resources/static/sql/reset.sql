@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS livre_genre CASCADE;
 DROP TABLE IF EXISTS contraint CASCADE;
 DROP TABLE IF EXISTS statut_prolongement CASCADE;
 DROP TABLE IF EXISTS statut_reservation CASCADE;
+DROP TABLE IF EXISTS statut_pret CASCADE;
 DROP TABLE IF EXISTS penalite CASCADE;
 DROP TABLE IF EXISTS paiement_cotisation CASCADE;
 DROP TABLE IF EXISTS prolongement CASCADE;
@@ -30,7 +31,6 @@ DROP TABLE IF EXISTS historique_statut_abonnement;
 DROP TABLE IF EXISTS jour_ferie;
 DROP TABLE IF EXISTS les_contraint;
 DROP TABLE IF EXISTS livre_contraint;
-DROP TABLE IF EXISTS statut_pret;
 
 
 

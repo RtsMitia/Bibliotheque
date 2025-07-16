@@ -31,6 +31,9 @@ public class PretController {
     @Autowired
     private ProlongementService prolongementService;
     
+    @Autowired
+    private AdherentAbonnementService abonnementService;
+    
     /**
      * Client requests to borrow a book
      */
@@ -76,6 +79,14 @@ public class PretController {
             
             // Create loan request with specified date
             java.time.LocalDate loanDate = java.time.LocalDate.parse(dateEmprunt);
+            
+            /*// Check if loan date falls within subscription period
+            if (!isLoanDateWithinSubscription(adherent, loanDate)) {
+                redirectAttributes.addFlashAttribute("errorMessage", 
+                    "L'abonnement n'est pas valide à cette date");
+                return "redirect:/client/livres";
+            }*/
+            
             java.time.LocalDateTime loanDateTime = loanDate.atStartOfDay();
             
             pretService.requestLoan(adherent, exemplaireOpt.get(), typePretOpt.get(), loanDateTime);
@@ -372,5 +383,27 @@ public class PretController {
         }
         
         return "redirect:/prets/prolongements";
+    }
+    
+    /**
+     * Check if the loan date falls within the adherent's subscription period
+     */
+    private boolean isLoanDateWithinSubscription(Adherent adherent, java.time.LocalDate loanDate) {
+        // Get all abonnements for the adherent
+        List<AdherentAbonnement> abonnements = abonnementService.getAbonnementsByAdherent(adherent);
+        
+        if (abonnements == null || abonnements.isEmpty()) {
+            return false;
+        }
+        
+        // Check if loan date falls within any subscription period
+        for (AdherentAbonnement abonnement : abonnements) {
+            if (!loanDate.isBefore(abonnement.getDebutAbonnement()) && 
+                !loanDate.isAfter(abonnement.getFinAbonnement())) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
